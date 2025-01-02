@@ -31,5 +31,8 @@ public class AuthController {
         // Validamos el usuario en la base de datos
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(authRequestDto.getUser());
 
+        // e. Generamos el token
+
+
     }
 }
