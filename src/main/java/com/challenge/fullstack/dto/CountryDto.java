@@ -3,7 +3,7 @@ package com.challenge.fullstack.dto;
 import lombok.Data;
 
 @Data
-public class PaisDto {
+public class CountryDto {
     private Name name;
     private Flags flags;
 
