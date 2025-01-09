@@ -4,6 +4,6 @@ import com.challenge.fullstack.model.PlantModel;
 
 import java.util.List;
 
-public interface IPlantService {
-    public List<PlantModel> findAll();
-}
+//public interface IPlantService {
+  //  public List<PlantModel> findAll();
+//}
