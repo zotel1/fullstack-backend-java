@@ -35,4 +35,23 @@ public class PlantService {
         return iPlantRepository.save(plant);
     }
 
+    public PlantModel updatePlant(Long id, String nombre, Long paisId, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
+        PlantModel plant = iPlantRepository.findById(id).orElseThrow(() -> new RuntimeException("Planta no encontrada."));
+
+        if (nombre != null) plant.setNombre(nombre);
+        if (paisId != null) {
+            Country pais = countryRepository.findById(paisId).orElseThrow(() -> new RuntimeException("Pais no encontrado."));
+            plant.setPais(pais);
+        }
+        if (cantidadLecturas != null) plant.setCantidadLecturas(cantidadLecturas);
+        if (alertasMedias != null) plant.setAlertasMedias(alertasMedias);
+        if (alertasRojas != null) plant.setAlertasRojas(alertasRojas);
+
+        return iPlantRepository.save(plant);
+    }
+
+    public void deletePlant(Long id) {
+        iPlantRepository.deleteById(id);
+    }
+
 }
