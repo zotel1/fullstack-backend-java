@@ -2,15 +2,8 @@
 
 spring:
   datasource:
-    datasource:
-      #url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-      #url: jdbc:mysql://localhost/railway
-      url: ${MYSQL_URL}
-      #username: ${DB_USER}
-      #username: root
-      #password: ${DB_PASSWORD}
-      #password: ${DB_PSWCAC}
-   # driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${MYSQL_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,7 +11,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-
   flyway:
     enabled: true
     locations: classpath:/db/migration
