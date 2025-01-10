@@ -1,23 +1,14 @@
 package com.challenge.fullstack.dto;
 
-import lombok.Data;
 
-
-//@Data
 public class CountryDto {
     private Name name;
     private Flags flags;
 
-  //  @Data
     public CountryDto(Name name, Flags flags) {
         this.name = name;
         this.flags = flags;
     }
-
-   // @Data
-    //public static class Flags {
-      //       private String png;
-   // }
 
 
     public Name getName() {
