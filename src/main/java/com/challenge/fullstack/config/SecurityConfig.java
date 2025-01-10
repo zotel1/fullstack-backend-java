@@ -1,6 +1,7 @@
 package com.challenge.fullstack.config;
 
 import com.challenge.fullstack.filter.JwtRequestFilter;
+import com.challenge.fullstack.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,9 @@ public class SecurityConfig {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Bean
     SecurityFilterChain web(HttpSecurity http) throws Exception {
