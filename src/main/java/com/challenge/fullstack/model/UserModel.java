@@ -56,4 +56,14 @@ public class UserModel {
         this.role = role;
     }
 
+    @Override
+    public String toString() {
+        return "UserModel{" +
+                "user_id=" + user_id +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
+                '}';
+    }
+
 }
