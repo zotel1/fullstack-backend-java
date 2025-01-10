@@ -27,8 +27,10 @@ public class CountryService {
         if (response.getStatusCode().is2xxSuccessful()) {
             List<CountryDto> countries = Arrays.asList(response.getBody());
             List<Country> entities = countries.stream()
-                    .map(dto -> new Country(null, dto.getName(), dto.getFlags()))
-                    .coollect(Collectors.toList());
+                    .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
+                    .collect(Collectors.toList());
+
+            countryRepository.saveAll(entities);
         }
     }
 }
