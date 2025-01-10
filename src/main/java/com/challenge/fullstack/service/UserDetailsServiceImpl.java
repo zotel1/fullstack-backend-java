@@ -26,6 +26,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
 
-        return new User(userModel.getName(), userModel.getPassword(), new ArrayList<>());
+      //  return new User(userModel.getName(), userModel.getPassword(), new ArrayList<>());
+        return User.builder()
+                .username(userModel.getName())
+                .password(userModel.getPassword())
+                .roles(userModel.getRole())
+                .build();
+
     }
 }
