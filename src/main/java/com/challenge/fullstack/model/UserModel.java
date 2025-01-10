@@ -7,6 +7,5 @@ public class UserModel {
     Integer user_id;
     String name;
     String password;
-    String phone;
     String role;
 }

@@ -1,7 +1,7 @@
 package com.challenge.fullstack.service;
 
 import com.challenge.fullstack.model.UserModel;
-import com.challenge.fullstack.repository.IUserRepository;
+import com.challenge.fullstack.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private IUserRepository iUserRepository;
+    private UserRepository iUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
