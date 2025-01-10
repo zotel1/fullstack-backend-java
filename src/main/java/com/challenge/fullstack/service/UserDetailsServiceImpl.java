@@ -15,12 +15,12 @@ import java.util.ArrayList;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserRepository iUserRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //Llamada a la base de datos
-        UserModel userModel = this.iUserRepository.findByName(username);
+        UserModel userModel = this.userRepository.findByName(username);
 
         if(userModel == null) {
             throw new UsernameNotFoundException(username);
