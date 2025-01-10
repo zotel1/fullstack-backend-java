@@ -1,14 +1,7 @@
 package com.challenge.fullstack.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.relational.core.sql.In;
 
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
 
 @Entity
 public class PlantModel {
