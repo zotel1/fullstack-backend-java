@@ -5,15 +5,26 @@ import jakarta.persistence.*;
 
 
 @Entity
+@Table(name = "users")
 public class UserModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "user_id")
     private Long user_id;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "role", nullable = false)
     private String role;
+
+    public UserModel() {
+
+    }
 
     public UserModel(Long user_id, String name, String password, String role) {
         this.user_id = user_id;

@@ -2,6 +2,10 @@ package com.challenge.fullstack.controller;
 
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.service.PlantService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.HttpStatus;
@@ -23,12 +27,18 @@ public class PlantController {
 
     // Controlador para obtener todas las plantas
     @GetMapping
+    @SecurityRequirement(name = "bearer-key")
     public ResponseEntity<List<PlantModel>> getAllPlants() {
         return ResponseEntity.ok(plantService.findAll());
     }
 
     // Controlador para crear una nueva planta
     @PostMapping
+    @Operation(summary ="Cree una nueva planta", description = "Agregue una nueva planta al sistema con un pais selecto")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Planta creada"),
+            @ApiResponse(responseCode = "400", description = "Entrada invalida")
+    })
     public ResponseEntity<PlantModel> createPlant(@RequestBody Map<String, Object> payload) {
         String nombre = (String) payload.get("nombre");
         Long paisId = Long.valueOf(payload.get("paisId").toString());
@@ -37,6 +47,11 @@ public class PlantController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Actualice una planta", description = "Actualice una planta con su respectivo pais")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Planta actualizada"),
+            @ApiResponse(responseCode = "404", description = "Planta no encontrada")
+    })
     public ResponseEntity<PlantModel> updatePlant(
             @PathVariable Long id,
             @RequestBody Map<String, Object> payload) {
@@ -50,7 +65,7 @@ public class PlantController {
         return ResponseEntity.ok(updatePlant);
     }
 
-    @DeleteMapping("/{id")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePlant(@PathVariable Long id) {
         plantService.deletePlant(id);
         return ResponseEntity.noContent().build();

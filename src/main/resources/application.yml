@@ -1,22 +1,69 @@
 #spring.application.name=fullstack-tech-forb
 
+#spring:
+  #datasource:
+ ##  url: ${MYSQL_URL}
+   # driver-class-name: com.mysql.cj.jdbc.Driver
+  #jpa:
+   # hibernate:
+    #  ddl-auto: update
+   # show-sql: true
+  #  properties:
+   ##   hibernate:
+     ##   dialect: org.hibernate.dialect.MySQL8Dialect
+  #flyway:
+   # enabled: true
+  #  locations: classpath:/db/migration
+   # schemas: railway
+  #  validate-on-migrate: false
+
+  #logging:
+   # level:
+    #  org.springframework: DEBUG
+
+
+## segunda opcion
 spring:
+  debug: true
+  #profile.active: dev, test, prod
   datasource:
-    url: ${MYSQL_URL}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
+    #url: jdbc:mysql://localhost/railway
+    username: ${DB_USER}
+    #username: root
+    password: ${DB_PASSWORD}
+    #password: ${DB_PSWCAC}
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
   flyway:
     enabled: true
     locations: classpath:/db/migration
     schemas: railway
     validate-on-migrate: false
 
+  server:
+    error:
+      include-stacktrace: never
+
+  springdoc:
+    api-docs:
+      enabled: true
+      path: /v3/api-docs
+    swagger-ui:
+      enabled: true
+      path: /swagger-ui.html
+      operations-sorter: method
+      display-request-duration: true
+      disable-swagger-default-url: true
+
   logging:
     level:
-      org.springframework: DEBUG
+      org.springframework.security: DEBUG
+
+  api:
+    security:
+      secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJuYW1lIjoiY3JpcyIsImlhdCI6MTUxNjIzOTAyMn0.RB7jN3PJIMkbVFfdc70yyWm3rVRmNdoWTUniVkdeHKI"
