@@ -27,7 +27,8 @@ spring:
   debug: true
   #profile.active: dev, test, prod
   datasource:
-    url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    #url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
     #url: jdbc:mysql://localhost/railway
     username: ${DB_USER}
     #username: root
