@@ -25,15 +25,9 @@
 ## segunda opcion
 spring:
   debug: true
-  #profile.active: dev, test, prod
   datasource:
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}
-    #url: jdbc:mysql://${DB_HOST}:3306/${DB_NAME}
-    #url: jdbc:mysql://localhost/railway
-    username: ${MYSQLUSER}
-    #username: root
-    password: ${MYSQLPASSWORD}
-    #password: ${DB_PSWCAC}
+    url: ${MYSQL_URL}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
     properties:
