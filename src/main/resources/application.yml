@@ -26,7 +26,7 @@
 spring:
   debug: true
   datasource:
-    url: ${MYSQL_URL}
+    url: jdbc:${MYSQL_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     show-sql: true
