@@ -66,7 +66,10 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200", // Desarrollo local
-                "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app" // Producción
+                "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app",
+                "https://forbtech-front.vercel.app/login",
+                "https://forbtech-front.vercel.app",// Frontend en Vercel
+                "https://frontend-angular-zeta.vercel.app" // Producción
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
