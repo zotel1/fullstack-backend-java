@@ -21,7 +21,8 @@ public class MyConfigurationCors {
                 "http://localhost:4200", // Desarrollo local
                 "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app",
                 "https://frontend-angular-zeta.vercel.app/login",
-                "https://forbtech-front.vercel.app/login",// Frontend en Vercel
+                "https://forbtech-front.vercel.app/login",
+                "https://forbtech-front.vercel.app",// Frontend en Vercel
                 "https://frontend-angular-zeta.vercel.app" // Ajusta al dominio actual en Vercel
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Incluye OPTIONS para preflight
