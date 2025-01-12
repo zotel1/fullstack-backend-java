@@ -19,7 +19,8 @@ public class MyConfigurationCors {
         configuration.setAllowCredentials(true); // Permite enviar cookies y credenciales
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200", // Desarrollo local
-                "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app", // Frontend en Vercel
+                "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app",
+                "https://frontend-angular-zeta.vercel.app/login",// Frontend en Vercel
                 "https://frontend-angular-zeta.vercel.app" // Ajusta al dominio actual en Vercel
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Incluye OPTIONS para preflight
