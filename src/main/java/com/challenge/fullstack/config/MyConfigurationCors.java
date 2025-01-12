@@ -20,7 +20,8 @@ public class MyConfigurationCors implements WebMvcConfigurer {
                         "http://localhost:4200",
                         "http://fullstack-backend-java-production.up.railway.app/api/v1/countries",
                         "https://fullstack-backend-java-production.up.railway.app",
-                        "https://editor.swagger.io"
+                        "https://editor.swagger.io",
+                        "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app"
                 )
                 .allowedMethods("HEAD", "GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
