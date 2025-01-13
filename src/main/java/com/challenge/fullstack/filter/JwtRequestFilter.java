@@ -71,34 +71,29 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtTokenService jwtTokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
-            logger.info("Token recibido: {}");
-
+            System.out.println("Token recibido: " + jwt);
             try {
                 String username = jwtTokenService.extractUsername(jwt);
-                logger.info("Usuario extraído del token: {}"
-                  );//      username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                    if (jwtTokenService.validateToken(jwt, userDetails)) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities()
-                        );
-                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
-                    }
+                if (jwtTokenService.validateToken(jwt, userDetails)) {
+                    System.out.println("Token válido para usuario: " + username);
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("Token inválido");
                 }
             } catch (Exception e) {
-                logger.error("Error al procesar el token", e);
+                System.err.println("Error al procesar el token: " + e.getMessage());
             }
-        } else {
-            logger.warn("Falta el encabezado Authorization o el formato es incorrecto");
         }
         filterChain.doFilter(request, response);
     }

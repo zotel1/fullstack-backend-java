@@ -89,18 +89,33 @@ public class SecurityConfig {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
+    //@Bean
+    //public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      //  http.csrf(csrf -> csrf.disable()) // Desactiva CSRF
+        //        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configura CORS
+          //      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin estado
+            //    .authorizeHttpRequests(auth -> auth
+              //          .requestMatchers("/api/v1/auth/**").permitAll() // Permite rutas específicas sin autenticación
+                //        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
+                  //      .requestMatchers("/api/v1/auth/**", "/api/v1/countries", "/api/v1/plants").permitAll() // Acceso público
+                    //    .anyRequest().authenticated() // Requiere autenticación para el resto
+            //    )
+              //  .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Agrega filtro JWT
+      //  return http.build();
+    //}
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // Desactiva CSRF
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configura CORS
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin estado
+        http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll() // Permite rutas específicas sin autenticación
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/countries", "/api/v1/plants").permitAll() // Acceso público
-                        .anyRequest().authenticated() // Requiere autenticación para el resto
+                        .requestMatchers("/api/v1/auth/**").permitAll() // Permitir autenticación sin token
+                        .requestMatchers("/api/v1/countries/**").authenticated() // Requiere autenticación
+                        .requestMatchers("/api/v1/plants/**").authenticated() // Requiere autenticación
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Agrega filtro JWT
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
