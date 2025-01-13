@@ -68,15 +68,16 @@ public class AuthController {
                 new org.springframework.security.core.userdetails.User(
                         userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
                 ),
-                userModel.getName(),
-                userModel.getRole()
+                userModel.getRole(),
+                userModel.getName()
         );
 
         String refreshToken = jwtTokenService.generateRefreshToken(
                 new org.springframework.security.core.userdetails.User(
                         userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
                 ),
-                userModel.getRole()
+                userModel.getRole(),
+                userModel.getName()
         );
 
         AuthResponseDto response = new AuthResponseDto();
@@ -85,7 +86,6 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
-
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
@@ -104,8 +104,8 @@ public class AuthController {
             }
 
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
-                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole());
-                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole());
+                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole(), user.getName());
+                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole(), user.getName());
 
                 AuthResponseDto response = new AuthResponseDto();
                 response.setToken(newAccessToken);
@@ -119,7 +119,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error al procesar el token de actualización: " + e.getMessage());
         }
     }
-
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {

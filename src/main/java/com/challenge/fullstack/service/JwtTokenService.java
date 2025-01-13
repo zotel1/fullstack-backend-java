@@ -17,9 +17,8 @@ public class JwtTokenService {
 
     private final String apiSecret = "TExBVkVfTVVZX1NFQ1JFVEzE3Zmxu7BSGSJx72BSBXM";
 
-    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
-    private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
-
+    private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos
+    private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas
 
     public String generateToken(UserDetails userDetails, String role, String username) {
         Map<String, Object> claims = new HashMap<>();
@@ -35,9 +34,10 @@ public class JwtTokenService {
                 .compact();
     }
 
-    public String generateRefreshToken(UserDetails userDetails, String role) {
+    public String generateRefreshToken(UserDetails userDetails, String role, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("username", username);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -47,7 +47,6 @@ public class JwtTokenService {
                 .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
     }
-
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -62,7 +61,6 @@ public class JwtTokenService {
             return false;
         }
     }
-
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -82,12 +80,6 @@ public class JwtTokenService {
             return claimsResolver.apply(claims);
         } catch (ExpiredJwtException e) {
             throw new IllegalArgumentException("El token ha expirado", e);
-        } catch (UnsupportedJwtException e) {
-            throw new IllegalArgumentException("Formato de token no soportado", e);
-        } catch (MalformedJwtException e) {
-            throw new IllegalArgumentException("Token malformado", e);
-        } catch (SignatureException e) {
-            throw new IllegalArgumentException("Firma inválida del token", e);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al procesar el token", e);
         }
@@ -96,8 +88,8 @@ public class JwtTokenService {
     @PostConstruct
     public void validateSecret() {
         if (apiSecret == null || apiSecret.isEmpty()) {
-            throw new IllegalStateException("El valor de jwtSecret no está configurado");
+            throw new IllegalStateException("El valor de apiSecret no está configurado");
         }
-        System.out.println("JwtSecret configurado: " + apiSecret);
+        System.out.println("JwtSecret configurado correctamente");
     }
 }
