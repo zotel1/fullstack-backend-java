@@ -15,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtTokenService {
 
-    private final String jwtSecret = "eyJuYW1lIjoiZm9yYnRlY2giLCJwYXNzd29yZCI6InBsYW50YSIsInJvbGUiOiJVU0VSIn0=";
+    private final String jwtSecret = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6ImZvcmJ0ZWNoIiwiaWF0IjoxNzM2NzQyNzkwLCJleHAiOjE3MzY3NDM2OTB9.SaKuzFpIyid1XFmKI5zmvxRI0nOX8736k4oGiS0SsOI";
 
     private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
