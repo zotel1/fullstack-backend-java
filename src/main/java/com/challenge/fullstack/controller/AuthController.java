@@ -61,9 +61,9 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
             }
 
-            // Generar tokens
-            String accessToken = jwtTokenService.generateToken(userDetails); // Cambia aquí si es necesario
-            String refreshToken = jwtTokenService.generateRefreshToken(userDetails); // Cambia aquí si es necesario
+            // Generar tokens (ahora con dos argumentos)
+            String accessToken = jwtTokenService.generateToken(userDetails, userModel.getRole());
+            String refreshToken = jwtTokenService.generateRefreshToken(userDetails, userModel.getRole());
 
             AuthResponseDto response = new AuthResponseDto();
             response.setToken(accessToken);
@@ -86,9 +86,15 @@ public class AuthController {
             String username = jwtTokenService.extractUsername(refreshToken);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+            // Buscar el usuario para obtener el rol
+            UserModel user = userRepository.findByName(username);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+            }
+
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
-                String newAccessToken = jwtTokenService.generateToken(userDetails);
-                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails);
+                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole());
+                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole());
 
                 AuthResponseDto response = new AuthResponseDto();
                 response.setToken(newAccessToken);

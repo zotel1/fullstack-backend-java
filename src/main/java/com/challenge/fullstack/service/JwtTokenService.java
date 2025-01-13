@@ -39,9 +39,10 @@ public class JwtTokenService {
         //return token;
     //}
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", userDetails.getAuthorities().toString());
+        claims.put("role", role);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
@@ -51,23 +52,19 @@ public class JwtTokenService {
                 .compact();
     }
 
-
-
     public String generateRefreshToken(UserDetails userDetails, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
 
-        String refreshToken = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
-
-        System.out.println("Token de refresco generado: " + refreshToken);
-        return refreshToken;
     }
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
