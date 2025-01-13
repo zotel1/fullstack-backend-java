@@ -39,10 +39,9 @@ public class JwtTokenService {
         //return token;
     //}
 
-    public String generateToken(UserDetails userDetails, String role) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
-
+        claims.put("role", userDetails.getAuthorities().toString());
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
@@ -51,6 +50,7 @@ public class JwtTokenService {
                 .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
     }
+
 
 
     public String generateRefreshToken(UserDetails userDetails, String role) {

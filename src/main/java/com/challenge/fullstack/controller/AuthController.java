@@ -48,27 +48,22 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDto authRequestDto) {
         System.out.println("Intentando autenticar al usuario: " + authRequestDto.getUser());
         try {
-            // Buscar al usuario en la base de datos
-            UserModel userModel = userRepository.findByName(authRequestDto.getUser());
+            // Autenticación
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequestDto.getUser(), authRequestDto.getPassword())
+            );
 
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+            // Buscar al usuario
+            UserModel userModel = userRepository.findByName(authRequestDto.getUser());
             if (userModel == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
             }
 
-            System.out.println("Contraseña ingresada: " + authRequestDto.getPassword());
-            System.out.println("Contraseña en BD: " + userModel.getPassword());
-
-            // Validar la contraseña usando BCrypt
-            boolean passwordMatches = passwordEncoder.matches(authRequestDto.getPassword(), userModel.getPassword());
-            if (!passwordMatches) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta");
-            }
-
-            // Generar tokens si la contraseña es válida
-            String accessToken = jwtTokenService.generateToken(userModel.getName(), userModel.getRole());
-            String refreshToken = jwtTokenService.generateRefreshToken(userModel.getName(), userModel.getRole());
-
-            System.out.println("Autenticación exitosa para el usuario: " + userModel.getName());
+            // Generar tokens
+            String accessToken = jwtTokenService.generateToken(userDetails); // Cambia aquí si es necesario
+            String refreshToken = jwtTokenService.generateRefreshToken(userDetails); // Cambia aquí si es necesario
 
             AuthResponseDto response = new AuthResponseDto();
             response.setToken(accessToken);
@@ -92,10 +87,8 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
-                UserModel user = userRepository.findByName(username);
-
-                String newAccessToken = jwtTokenService.generateToken(user.getName(), user.getRole());
-                String newRefreshToken = jwtTokenService.generateRefreshToken(user.getName(), user.getRole());
+                String newAccessToken = jwtTokenService.generateToken(userDetails);
+                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails);
 
                 AuthResponseDto response = new AuthResponseDto();
                 response.setToken(newAccessToken);
@@ -109,6 +102,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error al procesar el token de actualización: " + e.getMessage());
         }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {
