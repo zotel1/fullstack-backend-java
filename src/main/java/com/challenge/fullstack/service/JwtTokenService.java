@@ -23,21 +23,35 @@ public class JwtTokenService {
     private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
 
+    //public String generateToken(UserDetails userDetails, String role) {
+      //  Map<String, Object> claims = new HashMap<>();
+        //claims.put("role", role);
+
+        //String token = Jwts.builder()
+          //      .setClaims(claims)
+            //    .setSubject(userDetails.getUsername())
+              //  .setIssuedAt(new Date())
+                //.setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+      //          .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
+        //        .compact();
+
+      //  System.out.println("Token de acceso generado: " + token);
+        //return token;
+    //}
+
     public String generateToken(UserDetails userDetails, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
                 .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
-
-        System.out.println("Token de acceso generado: " + token);
-        return token;
     }
+
 
     public String generateRefreshToken(UserDetails userDetails, String role) {
         Map<String, Object> claims = new HashMap<>();
