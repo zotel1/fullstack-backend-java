@@ -14,13 +14,13 @@ import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/summary")
+@RequestMapping("/api/v1")
 public class SummaryController {
 
     @Autowired
     private PlantService plantService;
 
-    @GetMapping("/list")
+    @GetMapping("/resumen")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getSummary() {
         Map<String, Object> summary = new HashMap<>();

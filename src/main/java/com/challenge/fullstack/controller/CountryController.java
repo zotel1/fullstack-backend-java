@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearer-key")
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/countries")
+@RequestMapping("/api/v1")
 public class CountryController {
 
     private final CountryService countryService;
@@ -29,7 +29,7 @@ public class CountryController {
 
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @GetMapping("/api/v1/countries/list")
+    @GetMapping("/paises")
     public ResponseEntity<List<CountryDto>> getCountries() {
         List<Country> countries = countryRepository.findAll();
         List<CountryDto> response = countries.stream()
