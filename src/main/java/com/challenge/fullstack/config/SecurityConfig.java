@@ -97,7 +97,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll() // Permite rutas específicas sin autenticación
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
-                        .requestMatchers("/api/v1/countries", "/api/v1/plants").permitAll() // Temporalmente público
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/countries", "/api/v1/plants").permitAll() // Acceso público
                         .anyRequest().authenticated() // Requiere autenticación para el resto
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Agrega filtro JWT
