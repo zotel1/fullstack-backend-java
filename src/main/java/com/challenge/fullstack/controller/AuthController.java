@@ -68,6 +68,7 @@ public class AuthController {
                 new org.springframework.security.core.userdetails.User(
                         userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
                 ),
+                userModel.getName(),
                 userModel.getRole()
         );
 
