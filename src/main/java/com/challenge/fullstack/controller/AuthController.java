@@ -82,9 +82,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
         String refreshToken = request.get("refreshToken");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El token de actualización no puede estar vacío");
+        }
         try {
             String username = jwtTokenService.extractUsername(refreshToken);
-
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
@@ -99,13 +101,12 @@ public class AuthController {
 
                 return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de actualización inválido");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token de actualización inválido o expirado");
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de actualización: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error al procesar el token de actualización: " + e.getMessage());
         }
     }
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {
         // Verificar si el usuario ya existe

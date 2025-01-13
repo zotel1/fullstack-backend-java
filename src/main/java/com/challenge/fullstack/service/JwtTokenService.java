@@ -1,8 +1,6 @@
 package com.challenge.fullstack.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +15,7 @@ import java.util.function.Function;
 @Service
 public class JwtTokenService {
 
-    private final String jwtSecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJuYW1lIjoiY3JpcyIsImlhdCI6MTUxNjIzOTAyMn0.RB7jN3PJIMkbVFfdc70yyWm3rVRmNdoWTUniVkdeHKI";
+    private final String jwtSecret = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6InBsYW50YSIsImlhdCI6MTczNjczMDk4NiwiZXhwIjoxNzM2NzMxODg2fQ.nrWDVRO9G0ux684LQP9OUEMsYy2Xv-yxzilODXZDBdI";
 
     private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
@@ -74,12 +72,24 @@ public class JwtTokenService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claimsResolver.apply(claims);
+        try {
+            final Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claimsResolver.apply(claims);
+        } catch (ExpiredJwtException e) {
+            throw new IllegalArgumentException("El token ha expirado", e);
+        } catch (UnsupportedJwtException e) {
+            throw new IllegalArgumentException("Formato de token no soportado", e);
+        } catch (MalformedJwtException e) {
+            throw new IllegalArgumentException("Token malformado", e);
+        } catch (SignatureException e) {
+            throw new IllegalArgumentException("Firma inválida del token", e);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error al procesar el token", e);
+        }
     }
 
     @PostConstruct
