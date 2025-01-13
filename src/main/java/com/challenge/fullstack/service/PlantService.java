@@ -24,13 +24,14 @@ public class PlantService {
     }
 
     public PlantModel createPlant(String nombre, Long paisId) {
-        Country pais = countryRepository.findById(paisId).orElseThrow(() -> new RuntimeException("Pais no encontrado."));
+        Country pais = countryRepository.findById(paisId)
+                .orElseThrow(() -> new RuntimeException("Pais no encontrado."));
         PlantModel plant = new PlantModel();
         plant.setNombre(nombre);
         plant.setPais(pais);
-        plant.setCantidadLecturas(0);
-        plant.setAlertasMedias(0);
-        plant.setAlertasRojas(0);
+        plant.setCantidadLecturas((int) (Math.random() * 100)); // Generación aleatoria
+        plant.setAlertasMedias((int) (Math.random() * 50));     // Generación aleatoria
+        plant.setAlertasRojas((int) (Math.random() * 20));      // Generación aleatoria
         return iPlantRepository.save(plant);
     }
 
@@ -52,5 +53,4 @@ public class PlantService {
     public void deletePlant(Long id) {
         iPlantRepository.deleteById(id);
     }
-
 }

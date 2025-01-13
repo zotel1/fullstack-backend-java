@@ -95,9 +95,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll() // Permite login/register sin token
-                        .requestMatchers("/api/v1/countries").authenticated() // Solo roles válidos .hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/api/v1/plants/**").authenticated()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/countries/**").hasRole("USER")
+                        .requestMatchers("/api/v1/plants/**").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

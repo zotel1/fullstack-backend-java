@@ -29,7 +29,6 @@ public class CountryService {
 
             if (response.getStatusCode().is2xxSuccessful()) {
                 List<CountryDto> countries = Arrays.asList(response.getBody());
-                countries.forEach(country -> System.out.println("Country: " + country.getName().getCommon()));
 
                 List<Country> entities = countries.stream()
                         .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
@@ -37,10 +36,10 @@ public class CountryService {
 
                 countryRepository.saveAll(entities);
             } else {
-                System.err.println("Error fetching countries. Status code: " + response.getStatusCode());
+                throw new RuntimeException("Error al obtener países: Código " + response.getStatusCode());
             }
         } catch (Exception e) {
-            System.err.println("Error while calling external API: " + e.getMessage());
+            throw new RuntimeException("Error al consumir la API externa: " + e.getMessage());
         }
     }
 }

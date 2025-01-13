@@ -39,12 +39,6 @@ spring:
       hibernate:
         format_sql: true
 
- # flyway:
-  #  enabled: true
-   # locations: classpath:/db/migration
-  #  schemas: railway
-   # validate-on-migrate: false
-
   server:
     error:
       include-stacktrace: never
@@ -67,6 +61,3 @@ spring:
   api:
     security:
       secret: ${JWT_SECRET:123456}
-  #api:
-   # security:
-    #  secret: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTYiLCJuYW1lIjoiY3JpcyIsImlhdCI6MTUxNjIzOTAyMn0.RB7jN3PJIMkbVFfdc70yyWm3rVRmNdoWTUniVkdeHKI"
