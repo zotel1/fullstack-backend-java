@@ -15,7 +15,10 @@ import java.util.function.Function;
 @Service
 public class JwtTokenService {
 
-    private final String jwtSecret = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6ImZvcmJ0ZWNoIiwiaWF0IjoxNzM2NzQyNzkwLCJleHAiOjE3MzY3NDM2OTB9.SaKuzFpIyid1XFmKI5zmvxRI0nOX8736k4oGiS0SsOI";
+    //private final String jwtSecret = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6ImZvcmJ0ZWNoIiwiaWF0IjoxNzM2NzQyNzkwLCJleHAiOjE3MzY3NDM2OTB9.SaKuzFpIyid1XFmKI5zmvxRI0nOX8736k4oGiS0SsOI";
+
+    @Value("${api.security.secret}")
+    private String apiSecret;
 
     private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
@@ -29,7 +32,7 @@ public class JwtTokenService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes(StandardCharsets.UTF_8))
+                .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
 
         System.out.println("Token de acceso generado: " + token);
@@ -45,7 +48,7 @@ public class JwtTokenService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret.getBytes(StandardCharsets.UTF_8))
+                .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
                 .compact();
 
         System.out.println("Token de refresco generado: " + refreshToken);
@@ -78,7 +81,7 @@ public class JwtTokenService {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         try {
             final Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(jwtSecret.getBytes(StandardCharsets.UTF_8))
+                    .setSigningKey(apiSecret.getBytes(StandardCharsets.UTF_8))
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -98,9 +101,9 @@ public class JwtTokenService {
 
     @PostConstruct
     public void validateSecret() {
-        if (jwtSecret == null || jwtSecret.isEmpty()) {
+        if (apiSecret == null || apiSecret.isEmpty()) {
             throw new IllegalStateException("El valor de jwtSecret no está configurado");
         }
-        System.out.println("JwtSecret configurado: " + jwtSecret);
+        System.out.println("JwtSecret configurado: " + apiSecret);
     }
 }
