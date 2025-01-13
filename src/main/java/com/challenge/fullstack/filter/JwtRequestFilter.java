@@ -71,31 +71,34 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtTokenService jwtTokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String authHeader = request.getHeader("Authorization");
+        final String authorizationHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String jwt = authHeader.substring(7);
-            System.out.println("Token recibido: " + jwt);
-            try {
-                String username = jwtTokenService.extractUsername(jwt);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if (jwtTokenService.validateToken(jwt, userDetails)) {
-                    System.out.println("Token válido para usuario: " + username);
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                } else {
-                    System.out.println("Token inválido");
-                }
-            } catch (Exception e) {
-                System.err.println("Error al procesar el token: " + e.getMessage());
-            }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            System.out.println("Token no presente o no válido");
+            chain.doFilter(request, response);
+            return;
         }
-        filterChain.doFilter(request, response);
+
+        String jwt = authorizationHeader.substring(7);
+        System.out.println("Token recibido: " + jwt);
+
+        try {
+            String username = jwtTokenService.extractUsername(jwt);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                if (jwtTokenService.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error validando el token: " + e.getMessage());
+        }
+
+        chain.doFilter(request, response);
     }
 
     @Override

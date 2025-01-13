@@ -89,21 +89,6 @@ public class SecurityConfig {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
-    //@Bean
-    //public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-      //  http.csrf(csrf -> csrf.disable()) // Desactiva CSRF
-        //        .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Configura CORS
-          //      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin estado
-            //    .authorizeHttpRequests(auth -> auth
-              //          .requestMatchers("/api/v1/auth/**").permitAll() // Permite rutas específicas sin autenticación
-                //        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll() // Swagger
-                  //      .requestMatchers("/api/v1/auth/**", "/api/v1/countries", "/api/v1/plants").permitAll() // Acceso público
-                    //    .anyRequest().authenticated() // Requiere autenticación para el resto
-            //    )
-              //  .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class); // Agrega filtro JWT
-      //  return http.build();
-    //}
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
@@ -111,8 +96,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll() // Permite login/register sin token
-                        .requestMatchers("/api/v1/countries").hasAnyRole("USER", "ADMIN") // Solo roles válidos
-                        .requestMatchers("/api/v1/plants/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/v1/countries").authenticated() // Solo roles válidos .hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/v1/plants/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
