@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@SecurityRequirement(name = "bearer-key")
 @RequestMapping("/api/v1/countries")
 @RestController
 @Controller
