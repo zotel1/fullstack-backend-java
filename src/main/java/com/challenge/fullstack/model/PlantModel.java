@@ -20,17 +20,21 @@ public class PlantModel {
     private Integer alertasMedias;
     private Integer alertasRojas;
 
+    @Column(name = "readings_ok", nullable = false)
+    private boolean readingsOk;
+
     public PlantModel(){
 
     }
 
-    public PlantModel(Long id, String nombre, Country pais, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas){
+    public PlantModel(Long id, String nombre, Country pais, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk){
         this.id = id;
         this.nombre = nombre;
         this.pais = pais;
         this.cantidadLecturas = cantidadLecturas;
         this.alertasMedias = alertasMedias;
         this.alertasRojas = alertasRojas;
+        this.readingsOk = readingsOk;
     }
 
     public Long getId() {
@@ -79,5 +83,13 @@ public class PlantModel {
 
     public void setAlertasRojas(Integer alertasRojas) {
         this.alertasRojas = alertasRojas;
+    }
+
+    public boolean isReadingsOk() {
+        return readingsOk;
+    }
+
+    public void setReadingsOk(boolean readingsOk) {
+        this.readingsOk = readingsOk;
     }
 }

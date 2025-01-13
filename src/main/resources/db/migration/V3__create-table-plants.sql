@@ -4,6 +4,7 @@ create table plants (
     pais_id bigint not null,
     cantidad_lecturas int not null,
     alertas_medias int not null,
-    alertas_rojas int not null
+    alertas_rojas int not null,
+    readings_ok BOOLEAN DEFAULT FALSE,
     constraint fk_plants_pais_id foreign key (pais_id) references pais (id)
 );
