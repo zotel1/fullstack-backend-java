@@ -26,7 +26,7 @@ import java.util.Map;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Autenticacion", description = "Endpoints de autenticación")
+@Tag(name = "Autenticación", description = "Endpoints de autenticación")
 public class AuthController {
 
     @Autowired
@@ -46,24 +46,29 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDto authRequestDto) {
-
         System.out.println("Intentando autenticar al usuario: " + authRequestDto.getUser());
-        System.out.println("Contraseña ingresada: " + authRequestDto.getPassword());
-
         try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequestDto.getUser(), authRequestDto.getPassword())
-            );
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            System.out.println("Autenticación exitosa para el usuario: " + userDetails.getUsername());
-
-
+            // Buscar al usuario en la base de datos
             UserModel userModel = userRepository.findByName(authRequestDto.getUser());
 
-            String accessToken = jwtTokenService.generateToken(userDetails, userModel.getRole());
-            String refreshToken = jwtTokenService.generateRefreshToken(userDetails, userModel.getRole());
+            if (userModel == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
+            }
+
+            System.out.println("Contraseña ingresada: " + authRequestDto.getPassword());
+            System.out.println("Contraseña en BD: " + userModel.getPassword());
+
+            // Validar la contraseña usando BCrypt
+            boolean passwordMatches = passwordEncoder.matches(authRequestDto.getPassword(), userModel.getPassword());
+            if (!passwordMatches) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta");
+            }
+
+            // Generar tokens si la contraseña es válida
+            String accessToken = jwtTokenService.generateToken(userModel.getName(), userModel.getRole());
+            String refreshToken = jwtTokenService.generateRefreshToken(userModel.getName(), userModel.getRole());
+
+            System.out.println("Autenticación exitosa para el usuario: " + userModel.getName());
 
             AuthResponseDto response = new AuthResponseDto();
             response.setToken(accessToken);
@@ -71,10 +76,7 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-
             System.err.println("Error de autenticación: " + e.getMessage());
-
-
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de autenticación: " + e.getMessage());
         }
     }
@@ -92,8 +94,8 @@ public class AuthController {
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
                 UserModel user = userRepository.findByName(username);
 
-                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole());
-                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole());
+                String newAccessToken = jwtTokenService.generateToken(user.getName(), user.getRole());
+                String newRefreshToken = jwtTokenService.generateRefreshToken(user.getName(), user.getRole());
 
                 AuthResponseDto response = new AuthResponseDto();
                 response.setToken(newAccessToken);
@@ -107,6 +109,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error al procesar el token de actualización: " + e.getMessage());
         }
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {
         // Verificar si el usuario ya existe
@@ -115,7 +118,6 @@ public class AuthController {
         }
 
         // Encriptar la contraseña
-      //  userModel.setPassword(new BCryptPasswordEncoder().encode(userModel.getPassword()));
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         System.out.println("Contraseña encriptada: " + userModel.getPassword());
 
@@ -124,6 +126,4 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con éxito");
     }
-
-
 }
