@@ -110,9 +110,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll() // Permitir autenticación sin token
-                        .requestMatchers("/api/v1/countries/**").authenticated() // Requiere autenticación
-                        .requestMatchers("/api/v1/plants/**").authenticated() // Requiere autenticación
+                        .requestMatchers("/api/v1/auth/**").permitAll() // Permite login/register sin token
+                        .requestMatchers("/api/v1/countries").hasAnyRole("USER", "ADMIN") // Solo roles válidos
+                        .requestMatchers("/api/v1/plants/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
