@@ -1,5 +1,6 @@
 package com.challenge.fullstack.service;
 
+import com.challenge.fullstack.dto.PlantDto;
 import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -19,9 +21,9 @@ public class PlantService {
     @Autowired
     private CountryRepository countryRepository;
 
-    public List<PlantModel> findAll() {
-        return iPlantRepository.findAll();
-    }
+    //public List<PlantModel> findAll() {
+      //  return iPlantRepository.findAll();
+    //}
 
 
 
@@ -40,6 +42,20 @@ public class PlantService {
 
     public int getDisabledSensorsCount() {
         return iPlantRepository.countByDisabledSensors(); // Define este método en el repositorio
+    }
+
+    public List<PlantDto> findAll() {
+        return iPlantRepository.findAll().stream()
+                .map(plant -> new PlantDto(
+                        plant.getId(),
+                        plant.getNombre(),
+                        plant.getPais().getName(),
+                        plant.getPais().getFlagUrl(),
+                        plant.getCantidadLecturas(),
+                        plant.getAlertasMedias(),
+                        plant.getAlertasRojas()
+                ))
+                .collect(Collectors.toList());
     }
 
     public PlantModel createPlant(String nombre, Long paisId) {

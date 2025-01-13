@@ -92,12 +92,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+               // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/countries/**").hasRole("USER")
-                        .requestMatchers("/api/v1/plants/**").hasRole("USER")
+                        .requestMatchers("/api/v1/countries/**").hasAnyRole( "ADMIN")
+                        .requestMatchers("/api/v1/plants/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/v1/summary/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
@@ -114,21 +115,21 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:4200", // Desarrollo local
-                "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app",
-                "https://forbtech-front.vercel.app",
-                "https://frontend-angular-zeta.vercel.app" // Producción
-        ));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+    //@Bean
+    //CorsConfigurationSource corsConfigurationSource() {
+      //  CorsConfiguration configuration = new CorsConfiguration();
+     //   configuration.setAllowCredentials(true);
+     //   configuration.setAllowedOrigins(Arrays.asList(
+       //         "http://localhost:4200", // Desarrollo local
+         //       "https://frontend-angular-du7wr8sfl-cristians-projects-3ed964a9.vercel.app",
+           //     "https://forbtech-front.vercel.app",
+             //   "https://frontend-angular-zeta.vercel.app" // Producción
+       // ));
+      //  configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        //configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+      //  configuration.setExposedHeaders(Arrays.asList("Authorization"));
+      //  UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        //source.registerCorsConfiguration("/**", configuration);
+       // return source;
+    //}
 }

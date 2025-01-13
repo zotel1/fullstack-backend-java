@@ -1,5 +1,6 @@
 package com.challenge.fullstack.controller;
 
+import com.challenge.fullstack.dto.PlantDto;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.service.PlantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class PlantController {
 
     @GetMapping("/list") // Subruta específica para obtener todas las plantas
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<PlantModel>> getAllPlants() {
+    public ResponseEntity<List<PlantDto>> getAllPlants() {
         return ResponseEntity.ok(plantService.findAll());
     }
 
