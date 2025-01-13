@@ -20,6 +20,6 @@ public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
     int countByRedAlerts();
 
     // Esta consulta debe coincidir con el atributo en PlantModel. Si disabled no existe, elimínala o corrige.
-//    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = true")
-  //  int countByDisabledSensors();
+    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = true")
+    int countByDisabledSensors();
 }

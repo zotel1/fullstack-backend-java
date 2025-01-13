@@ -23,11 +23,14 @@ public class PlantModel {
     @Column(name = "readings_ok", nullable = false)
     private boolean readingsOk;
 
+    // Agregar atributo "disabled" si es necesario
+    private boolean disabled;
+
     public PlantModel(){
 
     }
 
-    public PlantModel(Long id, String nombre, Country pais, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk){
+    public PlantModel(Long id, String nombre, Country pais, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled){
         this.id = id;
         this.nombre = nombre;
         this.pais = pais;
@@ -35,6 +38,7 @@ public class PlantModel {
         this.alertasMedias = alertasMedias;
         this.alertasRojas = alertasRojas;
         this.readingsOk = readingsOk;
+        this.disabled = disabled;
     }
 
     public Long getId() {
@@ -89,7 +93,21 @@ public class PlantModel {
         return readingsOk;
     }
 
+
+
     public void setReadingsOk(boolean readingsOk) {
         this.readingsOk = readingsOk;
     }
+
+    // NUEVO
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+
 }
