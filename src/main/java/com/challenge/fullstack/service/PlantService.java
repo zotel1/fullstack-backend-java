@@ -23,6 +23,25 @@ public class PlantService {
         return iPlantRepository.findAll();
     }
 
+
+
+
+    public int getReadingsOkCount() {
+        return iPlantRepository.countByReadingsOk(); // Define este método en el repositorio
+    }
+
+    public int getMediumAlertsCount() {
+        return iPlantRepository.countByMediumAlerts(); // Define este método en el repositorio
+    }
+
+    public int getRedAlertsCount() {
+        return iPlantRepository.countByRedAlerts(); // Define este método en el repositorio
+    }
+
+    public int getDisabledSensorsCount() {
+        return iPlantRepository.countByDisabledSensors(); // Define este método en el repositorio
+    }
+
     public PlantModel createPlant(String nombre, Long paisId) {
         Country pais = countryRepository.findById(paisId)
                 .orElseThrow(() -> new RuntimeException("Pais no encontrado."));

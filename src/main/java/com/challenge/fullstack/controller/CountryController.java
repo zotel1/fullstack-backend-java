@@ -8,10 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,8 +27,9 @@ public class CountryController {
         this.countryRepository = countryRepository;
     }
 
-    @GetMapping
+
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping("/api/v1/countries/list")
     public ResponseEntity<List<CountryDto>> getCountries() {
         List<Country> countries = countryRepository.findAll();
         List<CountryDto> response = countries.stream()
@@ -42,7 +40,7 @@ public class CountryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/update")
+    @PutMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> fetchCountries() {
         countryService.fetchSaveCountries();
