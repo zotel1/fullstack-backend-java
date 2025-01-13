@@ -17,8 +17,8 @@ public class JwtTokenService {
 
     //private final String jwtSecret = "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInN1YiI6ImZvcmJ0ZWNoIiwiaWF0IjoxNzM2NzQyNzkwLCJleHAiOjE3MzY3NDM2OTB9.SaKuzFpIyid1XFmKI5zmvxRI0nOX8736k4oGiS0SsOI";
 
-    @Value("${api.security.secret}")
-    private String apiSecret;
+    //@Value("${api.security.secret}")
+    private final String apiSecret = "TExBVkVfTVVZX1NFQ1JFVEzE3Zmxu7BSGSJx72BSBXM";
 
     private static final long ACCESS_TOKEN_VALIDITY = 1000 * 60 * 15; // 15 minutos de validez
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
