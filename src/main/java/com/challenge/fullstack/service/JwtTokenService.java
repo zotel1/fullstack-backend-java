@@ -21,9 +21,10 @@ public class JwtTokenService {
     private static final long REFRESH_TOKEN_VALIDITY = 1000 * 60 * 60 * 24; // 24 horas para el token de refresco
 
 
-    public String generateToken(UserDetails userDetails, String role) {
+    public String generateToken(UserDetails userDetails, String role, String username) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);
+        claims.put("username", username);
 
         return Jwts.builder()
                 .setClaims(claims)
