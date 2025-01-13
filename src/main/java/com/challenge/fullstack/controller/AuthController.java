@@ -14,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -47,34 +49,42 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDto authRequestDto) {
         System.out.println("Intentando autenticar al usuario: " + authRequestDto.getUser());
-        try {
-            // Autenticación
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequestDto.getUser(), authRequestDto.getPassword())
-            );
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            // Buscar al usuario
-            UserModel userModel = userRepository.findByName(authRequestDto.getUser());
-            if (userModel == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
-            }
-
-            // Generar tokens (ahora con dos argumentos)
-            String accessToken = jwtTokenService.generateToken(userDetails, userModel.getRole());
-            String refreshToken = jwtTokenService.generateRefreshToken(userDetails, userModel.getRole());
-
-            AuthResponseDto response = new AuthResponseDto();
-            response.setToken(accessToken);
-            response.setRefreshToken(refreshToken);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            System.err.println("Error de autenticación: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error de autenticación: " + e.getMessage());
+        UserModel userModel = userRepository.findByName(authRequestDto.getUser());
+        if (userModel == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
         }
+
+        boolean passwordMatches = passwordEncoder.matches(authRequestDto.getPassword(), userModel.getPassword());
+        if (!passwordMatches) {
+            System.err.println("Contraseña incorrecta");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
+
+        System.out.println("Contraseña válida para el usuario: " + userModel.getName());
+
+        // Generar tokens
+        String accessToken = jwtTokenService.generateToken(
+                new org.springframework.security.core.userdetails.User(
+                        userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
+                ),
+                userModel.getRole()
+        );
+
+        String refreshToken = jwtTokenService.generateRefreshToken(
+                new org.springframework.security.core.userdetails.User(
+                        userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
+                ),
+                userModel.getRole()
+        );
+
+        AuthResponseDto response = new AuthResponseDto();
+        response.setToken(accessToken);
+        response.setRefreshToken(refreshToken);
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> request) {
