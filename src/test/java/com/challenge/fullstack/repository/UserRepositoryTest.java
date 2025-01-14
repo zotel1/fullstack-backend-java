@@ -26,7 +26,7 @@ public class UserRepositoryTest {
 
         // Validar que se encontró y los datos son correctos
         assertNotNull(found, "El usuario no debería ser nulo");
-        assertEquals("testuser", found.getName(), "El nombre no coincide");
+        assertEquals("testuser", found.getUsername(), "El nombre no coincide");
         assertEquals("password", found.getPassword(), "La contraseña no coincide");
         assertEquals("ROLE_USER", found.getRole(), "El rol no coincide");
     }
