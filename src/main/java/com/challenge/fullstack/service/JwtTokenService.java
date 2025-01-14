@@ -1,11 +1,13 @@
 package com.challenge.fullstack.service;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,29 +24,34 @@ public class JwtTokenService {
 
     public String generateToken(UserDetails userDetails, String role, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
         claims.put("username", username);
+        claims.put("role", "ROLE_" + role);
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(apiSecret.getBytes(StandardCharsets.UTF_8)); // Genera la clave
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
+                .signWith(secretKey, SignatureAlgorithm.HS256) // Usa la clave y el algoritmo
                 .compact();
     }
 
     public String generateRefreshToken(UserDetails userDetails, String role, String username) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+        //claims.put("role", role);
         claims.put("username", username);
+        claims.put("role", "ROLE_" + role);
+
+        SecretKey secretKey = Keys.hmacShaKeyFor(apiSecret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS256, apiSecret.getBytes(StandardCharsets.UTF_8))
+                .signWith(secretKey ,SignatureAlgorithm.HS256)
                 .compact();
     }
 
