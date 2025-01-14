@@ -5,6 +5,7 @@ create table plants (
     cantidad_lecturas int not null,
     alertas_medias int not null,
     alertas_rojas int not null,
-    readings_ok BOOLEAN DEFAULT FALSE,
+    readings_ok boolean default false,
+    disabled boolean default false,
     constraint fk_plants_country_id foreign key (country_id) references country (id)
 );
