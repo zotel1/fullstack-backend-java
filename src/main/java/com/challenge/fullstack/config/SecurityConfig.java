@@ -86,7 +86,7 @@ public class SecurityConfig {
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfiguration {
+public class SecurityConfig {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
