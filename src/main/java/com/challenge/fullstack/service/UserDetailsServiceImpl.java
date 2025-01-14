@@ -28,7 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
 
-        System.out.println("Usuario encontrado: " + userModel.getName());
+        System.out.println("Usuario encontrado: " + userModel.getUsername());
         System.out.println("Rol del usuario: " + userModel.getRole());
 
         // Normaliza el rol para asegurar que tiene el prefijo "ROLE_"
@@ -36,7 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Retorna un objeto UserDetails con los detalles del usuario
         return User.builder()
-                .username(userModel.getName()) // Nombre de usuario
+                .username(userModel.getUsername()) // Nombre de usuario
                 .password(userModel.getPassword()) // Contraseña encriptada
                 .roles(role.replaceFirst("^ROLE_", "")) // Normaliza roles redundantes
                 .build();
