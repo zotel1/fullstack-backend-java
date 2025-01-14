@@ -54,4 +54,22 @@ public class PlantService {
 
         return iPlantRepository.save(plant);
     }
+
+        public int getReadingsOkCount() {
+            return iPlantRepository.countByReadingsOk(); // Este método debe estar definido en el repositorio
+        }
+
+        public int getMediumAlertsCount() {
+            return iPlantRepository.countByMediumAlerts(); // Este método debe estar definido en el repositorio
+        }
+
+        public int getRedAlertsCount() {
+            return iPlantRepository.countByRedAlerts(); // Este método debe estar definido en el repositorio
+        }
+
+        public int getDisabledSensorsCount() {
+            return iPlantRepository.countByDisabledSensors(); // Este método debe estar definido en el repositorio
+        }
+    }
+
 }
