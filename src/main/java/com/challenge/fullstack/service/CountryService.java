@@ -25,30 +25,27 @@ public class CountryService {
         String url = "https://restcountries.com/v3.1/all";
 
         try {
-            System.out.println("Consumiendo la API externa...");
             ResponseEntity<CountryDto[]> response = restTemplate.getForEntity(url, CountryDto[].class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 List<CountryDto> countries = Arrays.asList(response.getBody());
-                System.out.println("Cantidad de países obtenidos: " + countries.size());
 
-                List<Country> entities = countries.stream()
-                        .map(dto -> {
-                            System.out.println("Procesando país: " + dto.getName().getCommon());
-                            return new Country(null, dto.getName().getCommon(), dto.getFlags().getPng());
-                        })
-                        .collect(Collectors.toList());
+                for (CountryDto dto : countries) {
+                    String countryName = dto.getName().getCommon();
+                    String flagUrl = dto.getFlags().getPng();
 
-                System.out.println("Guardando países en la base de datos...");
-                countryRepository.saveAll(entities);
-                System.out.println("Países guardados exitosamente.");
+                    if (!countryRepository.existsByName(countryName)) {
+                        Country country = new Country(null, countryName, flagUrl);
+                        countryRepository.save(country);
+                    }
+                }
             } else {
-                System.err.println("Error al obtener países: Código " + response.getStatusCode());
+                throw new RuntimeException("Error al obtener países: Código " + response.getStatusCode());
             }
         } catch (Exception e) {
-            System.err.println("Error al consumir la API externa: " + e.getMessage());
             throw new RuntimeException("Error al consumir la API externa: " + e.getMessage());
         }
     }
+
 
 }
