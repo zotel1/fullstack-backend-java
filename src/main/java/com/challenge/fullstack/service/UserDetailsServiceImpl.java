@@ -19,8 +19,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Llamada a la base de datos
@@ -30,21 +28,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
 
-        System.out.println("Usuario encontrado: " + userModel);
-        System.out.println("Contraseña en BD: " + userModel.getPassword());
-
-        // Comprobación manual de la contraseña
-
-        String testPassword = "password";
-        boolean passwordMatches = new BCryptPasswordEncoder().matches("contraseña_prueba", userModel.getPassword());
-        System.out.println("¿La contraseña coincide? " + passwordMatches);
-
-        // Retornar UserDetails
+        // Construcción del objeto UserDetails
         return User.builder()
                 .username(userModel.getName())
                 .password(userModel.getPassword())
-                .roles(userModel.getRole().toUpperCase())
+                .roles(userModel.getRole().startsWith("ROLE_") ? userModel.getRole() : "ROLE_" + userModel.getRole())
                 .build();
     }
-
 }
+

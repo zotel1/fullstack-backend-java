@@ -61,7 +61,7 @@ public class JwtTokenService {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            String username = extractUsername(token);
+            final String username = extractUsername(token);
             return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
         } catch (Exception e) {
             System.err.println("Error al validar el token: " + e.getMessage());
@@ -94,9 +94,13 @@ public class JwtTokenService {
 
     @PostConstruct
     public void validateSecret() {
-        if (apiSecret == null || apiSecret.isEmpty()) {
-            throw new IllegalStateException("El valor de apiSecret no está configurado");
+        if (apiSecret == null || apiSecret.isBlank()) {
+            throw new IllegalStateException("El valor de apiSecret no está configurado o está vacío");
         }
-        System.out.println("JwtSecret configurado correctamente");
+        if (apiSecret.length() < 32) {
+            throw new IllegalStateException("El valor de apiSecret debe tener al menos 32 caracteres para mayor seguridad");
+        }
+        System.out.println("JwtSecret configurado correctamente y cumple con los requisitos de seguridad.");
     }
+
 }
