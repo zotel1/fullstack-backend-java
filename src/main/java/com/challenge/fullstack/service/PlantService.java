@@ -2,18 +2,18 @@ package com.challenge.fullstack.service;
 
 import com.challenge.fullstack.dto.CountryDto;
 import com.challenge.fullstack.dto.PlantDto;
-import com.challenge.fullstack.dto.RestCountryDto;
 import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
 import com.challenge.fullstack.repository.IPlantRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.List;
+import java.util.Optional;
+
 import java.util.stream.Collectors;
 
 
@@ -30,6 +30,8 @@ public class PlantService {
 
     @Autowired
     private CountryApiService countryApiService;
+
+    private static final String REST_COUNTRIES_API = "https://restcountries.com/v3.1/all";
 
 
     @Autowired
@@ -74,20 +76,35 @@ public class PlantService {
         Country country = countryRepository.findByName(countryName).orElseGet(() -> {
             System.out.println("País no encontrado en la base de datos. Consultando API externa...");
 
-            // Consumir la API de Rest Country para obtener datos del país
-            List<RestCountryDto> countries = countryApiService.fetchCountriesFromApi();
+            try {
+                // Llamada a la API externa
+                String response = restTemplate.getForObject(REST_COUNTRIES_API, String.class);
 
-            // Buscar el país por su nombre común
-            RestCountryDto matchingCountry = countries.stream()
-                    .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
-                    .findFirst()
-                    .orElseThrow(() -> new RuntimeException("País no encontrado en la API externa"));
+                // Usar Jackson para deserializar
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<CountryDto> countries = objectMapper.readValue(response, new TypeReference<List<CountryDto>>() {});
 
-            // Guardar el país en la base de datos
-            Country newCountry = new Country();
-            newCountry.setName(matchingCountry.getName().getCommon());
-            newCountry.setFlagUrl(matchingCountry.getFlags().getPng());
-            return countryRepository.save(newCountry);
+                // Buscar el país en la respuesta
+                Optional<CountryDto> matchingCountry = countries.stream()
+                        .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
+                        .findFirst();
+
+                if (matchingCountry.isEmpty()) {
+                    throw new RuntimeException("País no encontrado en la API externa: " + countryName);
+                }
+
+                CountryDto dto = matchingCountry.get();
+                System.out.println("País encontrado en la API externa: " + dto.getName().getCommon());
+
+                // Guardar el país en la base de datos
+                Country newCountry = new Country();
+                newCountry.setName(dto.getName().getCommon());
+                newCountry.setFlagUrl(dto.getFlags().getPng());
+                return countryRepository.save(newCountry);
+
+            } catch (Exception e) {
+                throw new RuntimeException("Error al consumir o procesar la API externa: " + e.getMessage());
+            }
         });
 
         System.out.println("País asociado: " + country.getName());
