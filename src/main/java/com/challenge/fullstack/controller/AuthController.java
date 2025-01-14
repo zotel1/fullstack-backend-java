@@ -50,7 +50,7 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequestDto authRequestDto) {
         System.out.println("Intentando autenticar al usuario: " + authRequestDto.getUser());
 
-        UserModel userModel = userRepository.findByName(authRequestDto.getUser());
+        UserModel userModel = userRepository.findByUsername(authRequestDto.getUser());
         if (userModel == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
         }
@@ -98,7 +98,7 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             // Buscar el usuario para obtener el rol
-            UserModel user = userRepository.findByName(username);
+            UserModel user = userRepository.findByUsername(username);
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
             }
@@ -123,7 +123,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {
         // Verificar si el usuario ya existe
-        if (userRepository.findByName(userModel.getUsername()) != null) {
+        if (userRepository.findByUsername(userModel.getUsername()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya existe");
         }
 
