@@ -10,6 +10,7 @@ public class CountryDto {
     private Flags flags;
 
     public CountryDto(Name name, Flags flags) {
+
     }
 
     public Name getName() {
