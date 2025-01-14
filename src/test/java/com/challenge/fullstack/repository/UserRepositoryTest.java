@@ -22,7 +22,7 @@ public class UserRepositoryTest {
         userRepository.save(user);
 
         // Buscar al usuario por nombre
-        UserModel found = userRepository.findByName("testuser");
+        UserModel found = userRepository.findByUsername("testuser");
 
         // Validar que se encontró y los datos son correctos
         assertNotNull(found, "El usuario no debería ser nulo");
