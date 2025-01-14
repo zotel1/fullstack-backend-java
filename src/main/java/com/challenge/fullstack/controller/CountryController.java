@@ -30,19 +30,19 @@ public class CountryController {
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/countries")
-    public ResponseEntity<?> getCountries() {
-        try {
-            List<Country> countries = countryRepository.findAll();
-            List<CountryDto> response = countries.stream()
-                    .map(country -> new CountryDto(
-                            new CountryDto.Name(country.getName()),
-                            new CountryDto.Flags(country.getFlagUrl())))
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener los países: " + e.getMessage());
-        }
+    public ResponseEntity<List<CountryDto>> getCountries() {
+        List<Country> countries = countryRepository.findAll();
+        System.out.println("Países obtenidos de la base de datos: " + countries.size());
+
+        List<CountryDto> response = countries.stream()
+                .map(country -> new CountryDto(
+                        new CountryDto.Name(country.getName()),
+                        new CountryDto.Flags(country.getFlagUrl())))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PutMapping("/countries/update")
     @PreAuthorize("hasRole('ADMIN')")

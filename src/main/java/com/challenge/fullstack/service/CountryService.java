@@ -29,23 +29,32 @@ public class CountryService {
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 List<CountryDto> countries = Arrays.asList(response.getBody());
+                System.out.println("Países obtenidos de la API: " + countries.size());
 
                 for (CountryDto dto : countries) {
                     String countryName = dto.getName().getCommon();
                     String flagUrl = dto.getFlags().getPng();
 
+                    System.out.println("Procesando país: " + countryName + ", URL de bandera: " + flagUrl);
+
+                    // Verifica si el país ya existe
                     if (!countryRepository.existsByName(countryName)) {
                         Country country = new Country(null, countryName, flagUrl);
                         countryRepository.save(country);
+                        System.out.println("País guardado: " + countryName);
+                    } else {
+                        System.out.println("El país ya existe: " + countryName);
                     }
                 }
             } else {
                 throw new RuntimeException("Error al obtener países: Código " + response.getStatusCode());
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir la API externa: " + e.getMessage());
+            System.err.println("Error al consumir la API externa: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
+
 
 
 }

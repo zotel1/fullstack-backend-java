@@ -25,6 +25,9 @@ public class PlantService {
     @Autowired
     private CountryRepository countryRepository;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
 
     public int getReadingsOkCount() {
         return iPlantRepository.countByReadingsOk(); // Define este método en el repositorio
@@ -61,18 +64,12 @@ public class PlantService {
         Country country = countryRepository.findByName(countryName).orElseGet(() -> {
             System.out.println("País no encontrado en la base de datos. Consultando API externa...");
 
-            RestTemplate restTemplate = new RestTemplate();
-            String url = "https://restcountries.com/v3.1/all";
+            String url = "https://restcountries.com/v3.1/name/" + countryName;
             ResponseEntity<CountryDto[]> response = restTemplate.getForEntity(url, CountryDto[].class);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                List<CountryDto> countries = Arrays.asList(response.getBody());
-
-                // Buscar el país por su nombre común
-                CountryDto matchingCountry = countries.stream()
-                        .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("País no encontrado en la API externa"));
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().length > 0) {
+                // Tomar el primer país que coincide con el nombre
+                CountryDto matchingCountry = response.getBody()[0];
 
                 // Guardar el país en la base de datos
                 Country newCountry = new Country();
@@ -80,7 +77,7 @@ public class PlantService {
                 newCountry.setFlagUrl(matchingCountry.getFlags().getPng());
                 return countryRepository.save(newCountry);
             } else {
-                throw new RuntimeException("Error al consumir la API externa de países");
+                throw new RuntimeException("País no encontrado en la API externa: " + countryName);
             }
         });
 
