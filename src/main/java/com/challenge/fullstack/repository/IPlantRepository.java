@@ -11,6 +11,7 @@ public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.readingsOk = true")
     int countByReadingsOk();
 
+
     // Consulta corregida para alertasMedias (alertasMedias es el nombre en PlantModel)
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.alertasMedias > 0")
     int countByMediumAlerts();
