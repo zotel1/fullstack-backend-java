@@ -12,8 +12,8 @@ public class UserModel {
     @Column(name = "user_id")
     private Long user_id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "username", nullable = false)
+    private String username;
 
     @Column(name = "password", nullable = false)
     private String password;
@@ -25,9 +25,9 @@ public class UserModel {
 
     }
 
-    public UserModel(Long user_id, String name, String password, String role) {
+    public UserModel(Long user_id, String username, String password, String role) {
         this.user_id = user_id;
-        this.name = name;
+        this.username = username;
         this.password = password;
         this.role = role;
     }
@@ -40,12 +40,12 @@ public class UserModel {
         this.user_id = user_id;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
@@ -68,7 +68,7 @@ public class UserModel {
     public String toString() {
         return "UserModel{" +
                 "user_id=" + user_id +
-                ", name='" + name + '\'' +
+                ", name='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", role='" + role + '\'' +
                 '}';
