@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 public class PlantService {
 
     @Autowired
+    private CountryService countryService;
+
+    @Autowired
     private IPlantRepository iPlantRepository;
 
     @Autowired
@@ -72,50 +75,16 @@ public class PlantService {
     }
 
     public PlantModel createPlant(String nombre, String countryName) {
-        // Verificar si el país ya existe en la base de datos
-        Country country = countryRepository.findByName(countryName).orElseGet(() -> {
-            System.out.println("País no encontrado en la base de datos. Consultando API externa...");
-
-            try {
-                // Llamada a la API externa
-                String response = restTemplate.getForObject(REST_COUNTRIES_API, String.class);
-
-                // Usar Jackson para deserializar
-                ObjectMapper objectMapper = new ObjectMapper();
-                List<CountryDto> countries = objectMapper.readValue(response, new TypeReference<List<CountryDto>>() {});
-
-                // Buscar el país en la respuesta
-                Optional<CountryDto> matchingCountry = countries.stream()
-                        .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
-                        .findFirst();
-
-                if (matchingCountry.isEmpty()) {
-                    throw new RuntimeException("País no encontrado en la API externa: " + countryName);
-                }
-
-                CountryDto dto = matchingCountry.get();
-                System.out.println("País encontrado en la API externa: " + dto.getName().getCommon());
-
-                // Guardar el país en la base de datos
-                Country newCountry = new Country();
-                newCountry.setName(dto.getName().getCommon());
-                newCountry.setFlagUrl(dto.getFlags().getPng());
-                return countryRepository.save(newCountry);
-
-            } catch (Exception e) {
-                throw new RuntimeException("Error al consumir o procesar la API externa: " + e.getMessage());
-            }
-        });
-
-        System.out.println("País asociado: " + country.getName());
+        // Buscar o crear el país en la base de datos
+        Country country = countryService.findOrCreateCountry(countryName);
 
         // Crear la planta
         PlantModel plant = new PlantModel();
         plant.setNombre(nombre);
         plant.setCountry(country);
-        plant.setCantidadLecturas((int) (Math.random() * 100)); // Generación aleatoria
-        plant.setAlertasMedias((int) (Math.random() * 50));     // Generación aleatoria
-        plant.setAlertasRojas((int) (Math.random() * 20));      // Generación aleatoria
+        plant.setCantidadLecturas((int) (Math.random() * 100));
+        plant.setAlertasMedias((int) (Math.random() * 50));
+        plant.setAlertasRojas((int) (Math.random() * 20));
         return iPlantRepository.save(plant);
     }
 
