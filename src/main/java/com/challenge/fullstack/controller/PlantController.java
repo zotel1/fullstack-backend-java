@@ -44,10 +44,10 @@ public class PlantController {
     public ResponseEntity<?> createPlant(@RequestBody Map<String, Object> payload) {
         try {
             String nombre = (String) payload.get("nombre");
-            Long countryId = Long.valueOf(payload.get("countryId").toString());
+            String countryName = (String) payload.get("countryName");
 
-            // Crear planta y verificar si el país ya existe
-            PlantModel plant = plantService.createPlant(nombre, countryId);
+            // Crear planta y manejar la lógica de país
+            PlantModel plant = plantService.createPlant(nombre, countryName);
             return ResponseEntity.status(HttpStatus.CREATED).body(plant);
 
         } catch (Exception e) {

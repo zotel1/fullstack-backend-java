@@ -1,13 +1,17 @@
 package com.challenge.fullstack.service;
 
+import com.challenge.fullstack.dto.CountryDto;
 import com.challenge.fullstack.dto.PlantDto;
 import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
 import com.challenge.fullstack.repository.IPlantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,9 +56,37 @@ public class PlantService {
                 .collect(Collectors.toList());
     }
 
-    public PlantModel createPlant(String nombre, Long countryId) {
-        Country country = countryRepository.findById(countryId)
-                .orElseThrow(() -> new RuntimeException("Pais no encontrado."));
+    public PlantModel createPlant(String nombre, String countryName) {
+        // Verificar si el país ya existe en la base de datos
+        Country country = countryRepository.findByName(countryName).orElseGet(() -> {
+            System.out.println("País no encontrado en la base de datos. Consultando API externa...");
+
+            RestTemplate restTemplate = new RestTemplate();
+            String url = "https://restcountries.com/v3.1/all";
+            ResponseEntity<CountryDto[]> response = restTemplate.getForEntity(url, CountryDto[].class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                List<CountryDto> countries = Arrays.asList(response.getBody());
+
+                // Buscar el país por su nombre común
+                CountryDto matchingCountry = countries.stream()
+                        .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("País no encontrado en la API externa"));
+
+                // Guardar el país en la base de datos
+                Country newCountry = new Country();
+                newCountry.setName(matchingCountry.getName().getCommon());
+                newCountry.setFlagUrl(matchingCountry.getFlags().getPng());
+                return countryRepository.save(newCountry);
+            } else {
+                throw new RuntimeException("Error al consumir la API externa de países");
+            }
+        });
+
+        System.out.println("País asociado: " + country.getName());
+
+        // Crear la planta
         PlantModel plant = new PlantModel();
         plant.setNombre(nombre);
         plant.setCountry(country);
@@ -63,6 +95,7 @@ public class PlantService {
         plant.setAlertasRojas((int) (Math.random() * 20));      // Generación aleatoria
         return iPlantRepository.save(plant);
     }
+
 
     public PlantModel updatePlant(Long id, String nombre, Long countryId, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
         PlantModel plant = iPlantRepository.findById(id).orElseThrow(() -> new RuntimeException("Planta no encontrada."));
