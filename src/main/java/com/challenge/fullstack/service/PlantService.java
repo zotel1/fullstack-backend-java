@@ -25,9 +25,15 @@ public class PlantService {
     @Autowired
     private CountryRepository countryRepository;
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
+
+    @Autowired
+    public PlantService(IPlantRepository iPlantRepository, CountryRepository countryRepository, RestTemplate restTemplate) {
+        this.iPlantRepository = iPlantRepository;
+        this.countryRepository = countryRepository;
+        this.restTemplate = restTemplate;
+    }
 
     public int getReadingsOkCount() {
         return iPlantRepository.countByReadingsOk(); // Define este método en el repositorio
