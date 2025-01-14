@@ -21,12 +21,6 @@ public class PlantService {
     @Autowired
     private CountryRepository countryRepository;
 
-    //public List<PlantModel> findAll() {
-      //  return iPlantRepository.findAll();
-    //}
-
-
-
 
     public int getReadingsOkCount() {
         return iPlantRepository.countByReadingsOk(); // Define este método en el repositorio
@@ -49,8 +43,8 @@ public class PlantService {
                 .map(plant -> new PlantDto(
                         plant.getId(),
                         plant.getNombre(),
-                        plant.getPais().getName(),
-                        plant.getPais().getFlagUrl(),
+                        plant.getCountry().getName(),
+                        plant.getCountry().getFlagUrl(),
                         plant.getCantidadLecturas(),
                         plant.getAlertasMedias(),
                         plant.getAlertasRojas()
@@ -58,25 +52,25 @@ public class PlantService {
                 .collect(Collectors.toList());
     }
 
-    public PlantModel createPlant(String nombre, Long paisId) {
-        Country pais = countryRepository.findById(paisId)
+    public PlantModel createPlant(String nombre, Long countryId) {
+        Country country = countryRepository.findById(countryId)
                 .orElseThrow(() -> new RuntimeException("Pais no encontrado."));
         PlantModel plant = new PlantModel();
         plant.setNombre(nombre);
-        plant.setPais(pais);
+        plant.setCountry(country);
         plant.setCantidadLecturas((int) (Math.random() * 100)); // Generación aleatoria
         plant.setAlertasMedias((int) (Math.random() * 50));     // Generación aleatoria
         plant.setAlertasRojas((int) (Math.random() * 20));      // Generación aleatoria
         return iPlantRepository.save(plant);
     }
 
-    public PlantModel updatePlant(Long id, String nombre, Long paisId, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
+    public PlantModel updatePlant(Long id, String nombre, Long countryId, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
         PlantModel plant = iPlantRepository.findById(id).orElseThrow(() -> new RuntimeException("Planta no encontrada."));
 
         if (nombre != null) plant.setNombre(nombre);
-        if (paisId != null) {
-            Country pais = countryRepository.findById(paisId).orElseThrow(() -> new RuntimeException("Pais no encontrado."));
-            plant.setPais(pais);
+        if (countryId != null) {
+            Country country = countryRepository.findById(countryId).orElseThrow(() -> new RuntimeException("Pais no encontrado."));
+            plant.setCountry(country);
         }
         if (cantidadLecturas != null) plant.setCantidadLecturas(cantidadLecturas);
         if (alertasMedias != null) plant.setAlertasMedias(alertasMedias);

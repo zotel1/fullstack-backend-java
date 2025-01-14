@@ -42,8 +42,8 @@ public class PlantController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<PlantModel> createPlant(@RequestBody Map<String, Object> payload) {
         String nombre = (String) payload.get("nombre");
-        Long paisId = Long.valueOf(payload.get("paisId").toString());
-        PlantModel plant = plantService.createPlant(nombre, paisId);
+        Long countryId = Long.valueOf(payload.get("countryId").toString());
+        PlantModel plant = plantService.createPlant(nombre, countryId);
         return ResponseEntity.status(HttpStatus.CREATED).body(plant);
     }
 
@@ -58,12 +58,12 @@ public class PlantController {
             @PathVariable Long id,
             @RequestBody Map<String, Object> payload) {
         String nombre = (String) payload.get("nombre");
-        Long paisId = payload.get("paisId") != null ? Long.valueOf(payload.get("paisId").toString()) : null;
+        Long countryId = payload.get("countryId") != null ? Long.valueOf(payload.get("countryId").toString()) : null;
         Integer cantidadLecturas = payload.get("cantidadLecturas") != null ? Integer.valueOf(payload.get("cantidadLecturas").toString()) : null;
         Integer alertasMedias = payload.get("alertasMedias") != null ? Integer.valueOf(payload.get("alertasMedias").toString()) : null;
         Integer alertasRojas = payload.get("alertasRojas") != null ? Integer.valueOf(payload.get("alertasRojas").toString()) : null;
 
-        PlantModel updatePlant = plantService.updatePlant(id, nombre, paisId, cantidadLecturas, alertasMedias, alertasRojas);
+        PlantModel updatePlant = plantService.updatePlant(id, nombre, countryId, cantidadLecturas, alertasMedias, alertasRojas);
         return ResponseEntity.ok(updatePlant);
     }
 

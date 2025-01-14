@@ -13,8 +13,8 @@ public class PlantModel {
     private String nombre;
 
     @ManyToOne
-    @JoinColumn(name = "pais_id", nullable = false)
-    private Country pais;
+    @JoinColumn(name = "country_id", nullable = false)
+    private Country country;
 
     private Integer cantidadLecturas;
     private Integer alertasMedias;
@@ -30,10 +30,10 @@ public class PlantModel {
 
     }
 
-    public PlantModel(Long id, String nombre, Country pais, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled){
+    public PlantModel(Long id, String nombre, Country country, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled){
         this.id = id;
         this.nombre = nombre;
-        this.pais = pais;
+        this.country = country;
         this.cantidadLecturas = cantidadLecturas;
         this.alertasMedias = alertasMedias;
         this.alertasRojas = alertasRojas;
@@ -57,12 +57,12 @@ public class PlantModel {
         this.nombre = nombre;
     }
 
-    public Country getPais() {
-        return pais;
+    public Country getCountry() {
+        return country;
     }
 
-    public void setPais(Country pais) {
-        this.pais = pais;
+    public void setCountry(Country country) {
+        this.country = country;
     }
 
     public Integer getCantidadLecturas() {

@@ -20,7 +20,7 @@ public class SummaryController {
     @Autowired
     private PlantService plantService;
 
-    @GetMapping("/resumen")
+    @GetMapping("/summary")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getSummary() {
         Map<String, Object> summary = new HashMap<>();

@@ -10,7 +10,6 @@ public class CountryDto {
         this.flags = flags;
     }
 
-
     public Name getName() {
         return name;
     }
@@ -31,10 +30,9 @@ public class CountryDto {
         private String common;
 
         public Name() {
-
         }
 
-        public Name(String common){
+        public Name(String common) {
             this.common = common;
         }
 
@@ -50,11 +48,10 @@ public class CountryDto {
     public static class Flags {
         private String png;
 
-        public Flags(){
-
+        public Flags() {
         }
 
-        public Flags(String png){
+        public Flags(String png) {
             this.png = png;
         }
 

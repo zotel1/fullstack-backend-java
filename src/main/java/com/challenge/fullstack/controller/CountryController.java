@@ -27,9 +27,8 @@ public class CountryController {
         this.countryRepository = countryRepository;
     }
 
-
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @GetMapping("/paises")
+    @GetMapping("/countries")
     public ResponseEntity<List<CountryDto>> getCountries() {
         List<Country> countries = countryRepository.findAll();
         List<CountryDto> response = countries.stream()
@@ -40,7 +39,7 @@ public class CountryController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/countries/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> fetchCountries() {
         countryService.fetchSaveCountries();

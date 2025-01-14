@@ -5,17 +5,17 @@ import com.challenge.fullstack.model.PlantModel;
 public class PlantDto {
     private Long id;
     private String nombre;
-    private String paisName;
-    private String paisFlagUrl;
+    private String countryName;
+    private String countryFlagUrl;
     private Integer cantidadLecturas;
     private Integer alertasMedias;
     private Integer alertasRojas;
 
-    public PlantDto(Long id, String nombre, String paisName, String paisFlagUrl, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
+    public PlantDto(Long id, String nombre, String countryName, String countryFlagUrl, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas) {
         this.id = id;
         this.nombre = nombre;
-        this.paisName = paisName;
-        this.paisFlagUrl = paisFlagUrl;
+        this.countryName = countryName;
+        this.countryFlagUrl = countryFlagUrl;
         this.cantidadLecturas = cantidadLecturas;
         this.alertasMedias = alertasMedias;
         this.alertasRojas = alertasRojas;
@@ -39,20 +39,20 @@ public class PlantDto {
         this.nombre = nombre;
     }
 
-    public String getPaisName() {
-        return paisName;
+    public String getCountryName() {
+        return countryName;
     }
 
-    public void setPaisName(String paisName) {
-        this.paisName = paisName;
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
     }
 
-    public String getPaisFlagUrl() {
-        return paisFlagUrl;
+    public String getCountryFlagUrl() {
+        return countryFlagUrl;
     }
 
-    public void setPaisFlagUrl(String paisFlagUrl) {
-        this.paisFlagUrl = paisFlagUrl;
+    public void setPaisFlagUrl(String countryFlagUrl) {
+        this.countryFlagUrl = countryFlagUrl;
     }
 
     public Integer getCantidadLecturas() {
