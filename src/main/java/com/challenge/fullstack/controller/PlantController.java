@@ -34,44 +34,62 @@ public class PlantController {
 
     // Controlador para crear una nueva planta
     @PostMapping("/create")
-    @Operation(summary ="Cree una nueva planta", description = "Agregue una nueva planta al sistema con un pais selecto")
+    @Operation(summary = "Cree una nueva planta", description = "Agregue una nueva planta al sistema con un país seleccionado")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Planta creada"),
-            @ApiResponse(responseCode = "400", description = "Entrada invalida")
+            @ApiResponse(responseCode = "400", description = "Entrada inválida"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<PlantModel> createPlant(@RequestBody Map<String, Object> payload) {
-        String nombre = (String) payload.get("nombre");
-        Long countryId = Long.valueOf(payload.get("countryId").toString());
-        PlantModel plant = plantService.createPlant(nombre, countryId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(plant);
+    public ResponseEntity<?> createPlant(@RequestBody Map<String, Object> payload) {
+        try {
+            String nombre = (String) payload.get("nombre");
+            Long countryId = Long.valueOf(payload.get("countryId").toString());
+
+            // Crear planta y verificar si el país ya existe
+            PlantModel plant = plantService.createPlant(nombre, countryId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(plant);
+
+        } catch (Exception e) {
+            // Manejo de excepciones
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la planta: " + e.getMessage());
+        }
     }
 
     @PutMapping("/update/{id}")
-    @Operation(summary = "Actualice una planta", description = "Actualice una planta con su respectivo pais")
+    @Operation(summary = "Actualice una planta", description = "Actualice una planta con su respectivo país")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Planta actualizada"),
-            @ApiResponse(responseCode = "404", description = "Planta no encontrada")
+            @ApiResponse(responseCode = "404", description = "Planta no encontrada"),
+            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<PlantModel> updatePlant(
+    public ResponseEntity<?> updatePlant(
             @PathVariable Long id,
             @RequestBody Map<String, Object> payload) {
-        String nombre = (String) payload.get("nombre");
-        Long countryId = payload.get("countryId") != null ? Long.valueOf(payload.get("countryId").toString()) : null;
-        Integer cantidadLecturas = payload.get("cantidadLecturas") != null ? Integer.valueOf(payload.get("cantidadLecturas").toString()) : null;
-        Integer alertasMedias = payload.get("alertasMedias") != null ? Integer.valueOf(payload.get("alertasMedias").toString()) : null;
-        Integer alertasRojas = payload.get("alertasRojas") != null ? Integer.valueOf(payload.get("alertasRojas").toString()) : null;
+        try {
+            String nombre = (String) payload.get("nombre");
+            Long countryId = payload.get("countryId") != null ? Long.valueOf(payload.get("countryId").toString()) : null;
+            Integer cantidadLecturas = payload.get("cantidadLecturas") != null ? Integer.valueOf(payload.get("cantidadLecturas").toString()) : null;
+            Integer alertasMedias = payload.get("alertasMedias") != null ? Integer.valueOf(payload.get("alertasMedias").toString()) : null;
+            Integer alertasRojas = payload.get("alertasRojas") != null ? Integer.valueOf(payload.get("alertasRojas").toString()) : null;
 
-        PlantModel updatePlant = plantService.updatePlant(id, nombre, countryId, cantidadLecturas, alertasMedias, alertasRojas);
-        return ResponseEntity.ok(updatePlant);
+            PlantModel updatePlant = plantService.updatePlant(id, nombre, countryId, cantidadLecturas, alertasMedias, alertasRojas);
+            return ResponseEntity.ok(updatePlant);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar la planta: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deletePlant(@PathVariable Long id) {
-        plantService.deletePlant(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletePlant(@PathVariable Long id) {
+        try {
+            plantService.deletePlant(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la planta: " + e.getMessage());
+        }
     }
-
 }
