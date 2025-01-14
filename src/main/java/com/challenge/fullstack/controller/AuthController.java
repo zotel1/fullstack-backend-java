@@ -61,23 +61,23 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
 
-        System.out.println("Contraseña válida para el usuario: " + userModel.getName());
+        System.out.println("Contraseña válida para el usuario: " + userModel.getUsername());
 
         // Generar tokens
         String accessToken = jwtTokenService.generateToken(
                 new org.springframework.security.core.userdetails.User(
-                        userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
+                        userModel.getUsername(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
                 ),
                 userModel.getRole(),
-                userModel.getName()
+                userModel.getUsername()
         );
 
         String refreshToken = jwtTokenService.generateRefreshToken(
                 new org.springframework.security.core.userdetails.User(
-                        userModel.getName(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
+                        userModel.getUsername(), userModel.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_" + userModel.getRole()))
                 ),
                 userModel.getRole(),
-                userModel.getName()
+                userModel.getUsername()
         );
 
         AuthResponseDto response = new AuthResponseDto();
@@ -104,8 +104,8 @@ public class AuthController {
             }
 
             if (jwtTokenService.validateToken(refreshToken, userDetails)) {
-                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole(), user.getName());
-                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole(), user.getName());
+                String newAccessToken = jwtTokenService.generateToken(userDetails, user.getRole(), user.getUsername());
+                String newRefreshToken = jwtTokenService.generateRefreshToken(userDetails, user.getRole(), user.getUsername());
 
                 AuthResponseDto response = new AuthResponseDto();
                 response.setToken(newAccessToken);
@@ -123,7 +123,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid UserModel userModel) {
         // Verificar si el usuario ya existe
-        if (userRepository.findByName(userModel.getName()) != null) {
+        if (userRepository.findByName(userModel.getUsername()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El usuario ya existe");
         }
 
