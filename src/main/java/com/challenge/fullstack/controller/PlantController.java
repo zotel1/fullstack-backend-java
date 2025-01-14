@@ -1,7 +1,10 @@
 package com.challenge.fullstack.controller;
 
 import com.challenge.fullstack.dto.PlantDto;
+import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
+import com.challenge.fullstack.repository.CountryRepository;
+import com.challenge.fullstack.repository.IPlantRepository;
 import com.challenge.fullstack.service.PlantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +29,12 @@ public class PlantController {
     @Autowired
     PlantService plantService;
 
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private IPlantRepository iPlantRepository;
+
     @GetMapping("/list") // Subruta específica para obtener todas las plantas
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<PlantDto>> getAllPlants() {
@@ -41,21 +50,18 @@ public class PlantController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> createPlant(@RequestBody Map<String, Object> payload) {
-        try {
-            String nombre = (String) payload.get("nombre");
-            String countryName = (String) payload.get("countryName");
+    public PlantModel createPlant(String nombre, String countryName) {
+        Country country = countryRepository.findByName(countryName)
+                .orElseThrow(() -> new RuntimeException("País no encontrado en la base de datos."));
 
-            if (nombre == null || countryName == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faltan campos obligatorios: 'nombre' y/o 'countryName'");
-            }
+        PlantModel plant = new PlantModel();
+        plant.setNombre(nombre);
+        plant.setCountry(country);
+        plant.setCantidadLecturas((int) (Math.random() * 100)); // Generación aleatoria
+        plant.setAlertasMedias((int) (Math.random() * 50));     // Generación aleatoria
+        plant.setAlertasRojas((int) (Math.random() * 20));      // Generación aleatoria
 
-            PlantModel plant = plantService.createPlant(nombre, countryName);
-            return ResponseEntity.status(HttpStatus.CREATED).body(plant);
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la planta: " + e.getMessage());
-        }
+        return iPlantRepository.save(plant);
     }
 
     @PutMapping("/update/{id}")
