@@ -105,6 +105,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
