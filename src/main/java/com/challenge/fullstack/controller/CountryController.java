@@ -6,6 +6,7 @@ import com.challenge.fullstack.service.CountryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,48 +15,23 @@ import java.util.stream.Collectors;
 @SecurityRequirement(name = "bearer-key")
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/countries")
 public class CountryController {
 
     private final CountryService countryService;
-    private final CountryRepository countryRepository;
 
-    public CountryController(CountryService countryService, CountryRepository countryRepository) {
+    public CountryController(CountryService countryService) {
         this.countryService = countryService;
-        this.countryRepository = countryRepository;
     }
 
-   // @GetMapping
-   // public ResponseEntity<List<CountryDto>> getCountries() {
-     //   try {
-       //     List<CountryDto> countries = countryService.getCountriesFromApi();
-         //   return ResponseEntity.ok(countries);
-      //  } catch (Exception e) {
-        //    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-       // }
-   @GetMapping
-   public ResponseEntity<List<CountryDto>> getCountries() {
-       try {
-           List<CountryDto> countries = countryService.getCountriesFromApi();
-           return ResponseEntity.ok(countries);
-       } catch (Exception e) {
-           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-       }
-   }
-
-    }
-
-
-
-   /* @PutMapping("/countries/update")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> fetchCountries() {
+    @GetMapping
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<CountryDto>> getAllCountries() {
         try {
-            countryService.findOrCreateCountry(c);
-            return ResponseEntity.ok("Países actualizados correctamente.");
+            List<CountryDto> countries = countryService.getAllCountries();
+            return ResponseEntity.ok(countries);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar los países: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-    }*/
-
-
+    }
+}
