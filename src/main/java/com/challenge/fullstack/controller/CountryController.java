@@ -25,16 +25,26 @@ public class CountryController {
         this.countryRepository = countryRepository;
     }
 
-    @GetMapping
-    public ResponseEntity<List<CountryDto>> getCountries() {
-        try {
-            List<CountryDto> countries = countryService.getCountriesFromApi();
-            return ResponseEntity.ok(countries);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+   // @GetMapping
+   // public ResponseEntity<List<CountryDto>> getCountries() {
+     //   try {
+       //     List<CountryDto> countries = countryService.getCountriesFromApi();
+         //   return ResponseEntity.ok(countries);
+      //  } catch (Exception e) {
+        //    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+       // }
+   @GetMapping
+   public ResponseEntity<List<CountryDto>> getCountries() {
+       try {
+           List<CountryDto> countries = countryService.getCountriesFromApi();
+           return ResponseEntity.ok(countries);
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+       }
+   }
+
     }
-}
+
 
 
    /* @PutMapping("/countries/update")
