@@ -34,7 +34,7 @@ public class PlantController {
 
     // Controlador para crear una nueva planta
     @PostMapping("/create")
-    @Operation(summary = "Cree una nueva planta", description = "Agregue una nueva planta al sistema con un país seleccionado")
+    @Operation(summary = "Crear una nueva planta", description = "Crea una planta asociada a un país")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Planta creada"),
             @ApiResponse(responseCode = "400", description = "Entrada inválida"),
@@ -46,12 +46,14 @@ public class PlantController {
             String nombre = (String) payload.get("nombre");
             String countryName = (String) payload.get("countryName");
 
-            // Crear planta y manejar la lógica de país
+            if (nombre == null || countryName == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faltan campos obligatorios: 'nombre' y/o 'countryName'");
+            }
+
             PlantModel plant = plantService.createPlant(nombre, countryName);
             return ResponseEntity.status(HttpStatus.CREATED).body(plant);
 
         } catch (Exception e) {
-            // Manejo de excepciones
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la planta: " + e.getMessage());
         }
     }

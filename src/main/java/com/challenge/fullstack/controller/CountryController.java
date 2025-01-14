@@ -5,6 +5,7 @@ import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.repository.CountryRepository;
 import com.challenge.fullstack.service.CountryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -29,20 +30,28 @@ public class CountryController {
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/countries")
-    public ResponseEntity<List<CountryDto>> getCountries() {
-        List<Country> countries = countryRepository.findAll();
-        List<CountryDto> response = countries.stream()
-                .map(country -> new CountryDto(
-                        new CountryDto.Name(country.getName()),
-                        new CountryDto.Flags(country.getFlagUrl())))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> getCountries() {
+        try {
+            List<Country> countries = countryRepository.findAll();
+            List<CountryDto> response = countries.stream()
+                    .map(country -> new CountryDto(
+                            new CountryDto.Name(country.getName()),
+                            new CountryDto.Flags(country.getFlagUrl())))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener los países: " + e.getMessage());
+        }
     }
 
     @PutMapping("/countries/update")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> fetchCountries() {
-        countryService.fetchSaveCountries();
-        return ResponseEntity.ok("Países actualizados correctamente.");
+        try {
+            countryService.fetchSaveCountries();
+            return ResponseEntity.ok("Países actualizados correctamente.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al actualizar los países: " + e.getMessage());
+        }
     }
 }
