@@ -2,6 +2,7 @@ package com.challenge.fullstack.service;
 
 import com.challenge.fullstack.dto.CountryDto;
 import com.challenge.fullstack.dto.PlantDto;
+import com.challenge.fullstack.dto.RestCountryDto;
 import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
@@ -26,6 +27,9 @@ public class PlantService {
     private CountryRepository countryRepository;
 
     private final RestTemplate restTemplate;
+
+    @Autowired
+    private CountryApiService countryApiService;
 
 
     @Autowired
@@ -70,21 +74,20 @@ public class PlantService {
         Country country = countryRepository.findByName(countryName).orElseGet(() -> {
             System.out.println("País no encontrado en la base de datos. Consultando API externa...");
 
-            String url = "https://restcountries.com/v3.1/name/" + countryName;
-            ResponseEntity<CountryDto[]> response = restTemplate.getForEntity(url, CountryDto[].class);
+            // Consumir la API de Rest Country para obtener datos del país
+            List<RestCountryDto> countries = countryApiService.fetchCountriesFromApi();
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().length > 0) {
-                // Tomar el primer país que coincide con el nombre
-                CountryDto matchingCountry = response.getBody()[0];
+            // Buscar el país por su nombre común
+            RestCountryDto matchingCountry = countries.stream()
+                    .filter(dto -> dto.getName().getCommon().equalsIgnoreCase(countryName))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("País no encontrado en la API externa"));
 
-                // Guardar el país en la base de datos
-                Country newCountry = new Country();
-                newCountry.setName(matchingCountry.getName().getCommon());
-                newCountry.setFlagUrl(matchingCountry.getFlags().getPng());
-                return countryRepository.save(newCountry);
-            } else {
-                throw new RuntimeException("País no encontrado en la API externa: " + countryName);
-            }
+            // Guardar el país en la base de datos
+            Country newCountry = new Country();
+            newCountry.setName(matchingCountry.getName().getCommon());
+            newCountry.setFlagUrl(matchingCountry.getFlags().getPng());
+            return countryRepository.save(newCountry);
         });
 
         System.out.println("País asociado: " + country.getName());
