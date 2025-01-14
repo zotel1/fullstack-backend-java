@@ -21,19 +21,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Llamada a la base de datos
+        // Llamada a la base de datos para obtener el usuario
         UserModel userModel = this.userRepository.findByName(username);
 
         if (userModel == null) {
             throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
 
-        // Construcción del objeto UserDetails
+        System.out.println("Usuario encontrado: " + userModel.getName());
+        System.out.println("Rol del usuario: " + userModel.getRole());
+
+        // Normaliza el rol para asegurar que tiene el prefijo "ROLE_"
+        String role = userModel.getRole().startsWith("ROLE_") ? userModel.getRole() : "ROLE_" + userModel.getRole();
+
+        // Retorna un objeto UserDetails con los detalles del usuario
         return User.builder()
-                .username(userModel.getName())
-                .password(userModel.getPassword())
-                .roles(userModel.getRole().startsWith("ROLE_") ? userModel.getRole() : "ROLE_" + userModel.getRole())
+                .username(userModel.getName()) // Nombre de usuario
+                .password(userModel.getPassword()) // Contraseña encriptada
+                .roles(role.replaceFirst("^ROLE_", "")) // Normaliza roles redundantes
                 .build();
     }
 }
+
 
