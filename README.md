@@ -1,4 +1,4 @@
-# **Manejo de Plantas - Backend**
+# **Manejo de Plantas - Backend- FORBTECH**
 
 ## **Descripción**
 Este proyecto es un backend desarrollado con **Java**, **Spring Boot** y **MySQL** para gestionar plantas y sus lecturas, incluyendo autenticación segura con **JWT**. Además, integra una API externa ([Rest Countries](https://restcountries.com/)) para obtener información de países.
