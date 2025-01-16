@@ -21,20 +21,20 @@ public class AppConfig {
     @Bean
     public RestTemplate restTemplate() {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100);
-        connectionManager.setDefaultMaxPerRoute(50);
+        connectionManager.setMaxTotal(600);
+        connectionManager.setDefaultMaxPerRoute(200);
 
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMinutes(2))
-                .setResponseTimeout(Timeout.ofMinutes(4))
-                .setConnectionRequestTimeout(Timeout.ofMinutes(1))
+                .setConnectTimeout(Timeout.ofMinutes(4))
+                .setResponseTimeout(Timeout.ofMinutes(8))
+                .setConnectionRequestTimeout(Timeout.ofMinutes(3))
                 .build();
 
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections()
-                .evictIdleConnections(TimeValue.ofMinutes(1))
+                .evictIdleConnections(TimeValue.ofMinutes(3))
                 .setDefaultHeaders(Collections.singletonList(new BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip")))
                 .build();
 
