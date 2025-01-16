@@ -1,6 +1,7 @@
 package com.challenge.fullstack.service;
 
 import com.challenge.fullstack.dto.CountryDto;
+import com.challenge.fullstack.dto.MinimalCountryDto;
 import com.challenge.fullstack.dto.PlantDto;
 import com.challenge.fullstack.dto.RestCountryDto;
 import com.challenge.fullstack.model.Country;
@@ -27,7 +28,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class CountryService {
 
@@ -49,9 +49,8 @@ public class CountryService {
 
         System.out.println("Iniciando la carga de países desde la API externa...");
         try {
-            // Llamada a la API externa
-            System.out.println("Llamando a la API externa: " + REST_COUNTRIES_API_URL);
-            ResponseEntity<List<RestCountryDto>> response = restTemplate.exchange(
+            // Consumo de la API con un DTO reducido
+            ResponseEntity<List<MinimalCountryDto>> response = restTemplate.exchange(
                     REST_COUNTRIES_API_URL,
                     HttpMethod.GET,
                     null,
@@ -62,14 +61,13 @@ public class CountryService {
                 throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
             }
 
-            // Filtrar y mapear solo los datos necesarios
+            // Procesar solo los datos necesarios
             List<Country> countries = response.getBody().stream()
                     .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
                     .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
                     .toList();
 
-            // Almacenar datos en la base de datos
-            System.out.println("Guardando los países en la base de datos...");
+            // Guardar los países en la base de datos
             countryRepository.saveAll(countries);
             System.out.println("Países almacenados correctamente.");
         } catch (Exception e) {
@@ -78,13 +76,7 @@ public class CountryService {
         }
     }
 
-    /**
-     * Obtiene todos los países desde la base de datos y los convierte en DTOs.
-     *
-     * @return Lista de CountryDto.
-     */
     public List<CountryDto> getAllCountries() {
-        System.out.println("Obteniendo todos los países de la base de datos...");
         return countryRepository.findAll().stream()
                 .map(country -> new CountryDto(
                         new CountryDto.Name(country.getName()),

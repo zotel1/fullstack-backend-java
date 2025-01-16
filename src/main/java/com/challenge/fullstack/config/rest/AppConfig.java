@@ -4,6 +4,7 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.apache.hc.core5.http.message.BasicHeader;
@@ -19,28 +20,24 @@ public class AppConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        // Configuración del pool de conexiones
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(100);
         connectionManager.setDefaultMaxPerRoute(50);
 
-        // Configuración de tiempos de espera
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMinutes(2)) // Tiempo de conexión
-                .setResponseTimeout(Timeout.ofMinutes(4)) // Tiempo de espera para respuesta
-                .setConnectionRequestTimeout(Timeout.ofMinutes(1)) // Tiempo para obtener conexión
+                .setConnectTimeout(Timeout.ofMinutes(2))
+                .setResponseTimeout(Timeout.ofMinutes(4))
+                .setConnectionRequestTimeout(Timeout.ofMinutes(1))
                 .build();
 
-        // Configuración del cliente HTTP
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections()
-                .evictIdleConnections(TimeValue.ofMinutes(1)) // Tiempo para eliminar conexiones inactivas
-                .setDefaultHeaders(Collections.singletonList(new BasicHeader("Accept-Encoding", "gzip")))
+                .evictIdleConnections(TimeValue.ofMinutes(1))
+                .setDefaultHeaders(Collections.singletonList(new BasicHeader(HttpHeaders.ACCEPT_ENCODING, "gzip")))
                 .build();
 
-        // Crear RestTemplate con HttpClient
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         return new RestTemplate(requestFactory);
     }
