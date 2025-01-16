@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+
 @Service
 public class CountryService {
 
@@ -49,37 +51,29 @@ public class CountryService {
         try {
             // Llamada a la API externa
             System.out.println("Llamando a la API externa: " + REST_COUNTRIES_API_URL);
-            ResponseEntity<String> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, String.class);
-            System.out.println("Estado de la respuesta: " + response.getStatusCode());
+            ResponseEntity<List<RestCountryDto>> response = restTemplate.exchange(
+                    REST_COUNTRIES_API_URL,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<>() {}
+            );
 
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
             }
 
-            // Procesamiento de la respuesta JSON
-            System.out.println("Procesando la respuesta de la API...");
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            RestCountryDto[] countryDtos = objectMapper.readValue(response.getBody(), RestCountryDto[].class);
-
-            // Filtrado y transformación de datos
-            List<Country> countries = Arrays.stream(countryDtos)
+            // Filtrar y mapear solo los datos necesarios
+            List<Country> countries = response.getBody().stream()
                     .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
                     .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
                     .toList();
 
-            // Almacenamiento en la base de datos
+            // Almacenar datos en la base de datos
             System.out.println("Guardando los países en la base de datos...");
             countryRepository.saveAll(countries);
             System.out.println("Países almacenados correctamente.");
-        } catch (HttpClientErrorException e) {
-            System.err.println("Error del cliente al consumir la API externa: " + e.getMessage());
-        } catch (HttpServerErrorException e) {
-            System.err.println("Error del servidor al consumir la API externa: " + e.getMessage());
-        } catch (JsonProcessingException e) {
-            System.err.println("Error al procesar la respuesta JSON: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Error inesperado al inicializar países: " + e.getMessage());
+            System.err.println("Error al consumir la API externa: " + e.getMessage());
             e.printStackTrace();
         }
     }
