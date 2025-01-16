@@ -21,8 +21,8 @@ public class CountryService {
 
     private final CountryRepository countryRepository;
     private final RestTemplate restTemplate;
-    private static final String REST_COUNTRIES_API_URL = "https://restcountries.com/v3.1/all";
-    private static final int BATCH_SIZE = 10; // Número de países a procesar por lote
+    private static final String REST_COUNTRIES_API_URL = "https://restcountries.com/v3.1/all?fields=name,flags";
+    private static final int BATCH_SIZE = 10; // Número de países por lote
 
     public CountryService(CountryRepository countryRepository, RestTemplate restTemplate) {
         this.countryRepository = countryRepository;
