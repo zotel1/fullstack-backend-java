@@ -2,15 +2,20 @@ package com.challenge.fullstack.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryDto {
 
     private Name name;
     private Flags flags;
 
-    public CountryDto(Name name, Flags flags) {
+    // Constructor vacío
+    public CountryDto() {
+    }
 
+    // Constructor completo
+    public CountryDto(Name name, Flags flags) {
+        this.name = name;
+        this.flags = flags;
     }
 
     public Name getName() {
@@ -28,17 +33,26 @@ public class CountryDto {
     public void setFlags(Flags flags) {
         this.flags = flags;
     }
-// Getters y Setters
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Name {
         private String common;
         private String official;
 
-        public Name(String name) {
+        // Constructor vacío
+        public Name() {
         }
 
-        // Getters y Setters
+        // Constructor para ambos campos
+        public Name(String common, String official) {
+            this.common = common;
+            this.official = official;
+        }
+
+        // Constructor para un solo campo (common)
+        public Name(String common) {
+            this.common = common;
+        }
 
         public String getCommon() {
             return common;
@@ -62,7 +76,19 @@ public class CountryDto {
         private String png;
         private String svg;
 
-        public Flags(String flagUrl) {
+        // Constructor vacío
+        public Flags() {
+        }
+
+        // Constructor completo
+        public Flags(String png, String svg) {
+            this.png = png;
+            this.svg = svg;
+        }
+
+        // Constructor para un solo campo (png)
+        public Flags(String png) {
+            this.png = png;
         }
 
         public String getPng() {
@@ -80,6 +106,5 @@ public class CountryDto {
         public void setSvg(String svg) {
             this.svg = svg;
         }
-// Getters y Setters
     }
 }

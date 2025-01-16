@@ -48,29 +48,31 @@ public class CountryService {
         System.out.println("Iniciando la carga de países desde la API externa...");
         try {
             // Realiza la solicitud a la API externa
-            ResponseEntity<CountryDto[]> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, CountryDto[].class);
+            ResponseEntity<String> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, String.class);
 
-            // Verifica si la respuesta es exitosa
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                List<CountryDto> countryDtos = Arrays.asList(response.getBody());
+            // Registra la respuesta JSON
+            System.out.println("Respuesta de la API de países:");
+            System.out.println(response.getBody());
 
-                // Mapea los datos de la API a entidades de la base de datos
-                List<Country> countries = countryDtos.stream()
-                        .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
-                        .collect(Collectors.toList());
+            // Deserializa la respuesta manualmente
+            ObjectMapper objectMapper = new ObjectMapper();
+            RestCountryDto[] countryDtos = objectMapper.readValue(response.getBody(), RestCountryDto[].class);
 
-                // Guarda los países en la base de datos
-                countryRepository.saveAll(countries);
-                System.out.println("Países almacenados correctamente.");
-            } else {
-                System.err.println("Error al consumir la API de países. Código de estado: " + response.getStatusCode());
-            }
+            // Guarda los países
+            List<Country> countries = Arrays.stream(countryDtos)
+                    .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
+                    .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
+                    .collect(Collectors.toList());
+
+
+            countryRepository.saveAll(countries);
+            System.out.println("Países almacenados correctamente.");
         } catch (Exception e) {
-            // Manejo de errores en caso de fallos en la solicitud
             System.err.println("Error al consumir la API externa: " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
     /**
      * Obtiene la lista de todos los países desde la base de datos.
@@ -78,11 +80,12 @@ public class CountryService {
      */
     public List<CountryDto> getAllCountries() {
         return countryRepository.findAll().stream()
+                .filter(country -> country.getName() != null && country.getFlagUrl() != null)
                 .map(country -> new CountryDto(
                         new CountryDto.Name(country.getName()),
                         new CountryDto.Flags(country.getFlagUrl())
                 ))
                 .collect(Collectors.toList());
     }
-}
 
+}

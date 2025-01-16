@@ -4,10 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RestCountryDto {
+
     private Name name;
     private Flags flags;
 
-    // Getters y setters
+    // Constructor vacío
+    public RestCountryDto() {
+    }
+
+    // Constructor completo
+    public RestCountryDto(Name name, Flags flags) {
+        this.name = name;
+        this.flags = flags;
+    }
+
     public Name getName() {
         return name;
     }
@@ -28,6 +38,15 @@ public class RestCountryDto {
     public static class Name {
         private String common;
 
+        // Constructor vacío
+        public Name() {
+        }
+
+        // Constructor completo
+        public Name(String common) {
+            this.common = common;
+        }
+
         public String getCommon() {
             return common;
         }
@@ -40,6 +59,15 @@ public class RestCountryDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Flags {
         private String png;
+
+        // Constructor vacío
+        public Flags() {
+        }
+
+        // Constructor completo
+        public Flags(String png) {
+            this.png = png;
+        }
 
         public String getPng() {
             return png;
