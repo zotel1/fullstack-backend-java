@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-@SecurityRequirement(name = "bearer-key")
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/countries")
+@CrossOrigin("*")
 public class CountryController {
 
     private final CountryService countryService;
@@ -26,13 +25,12 @@ public class CountryController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<List<CountryDto>> getAllCountries() {
         try {
             List<CountryDto> countries = countryService.getAllCountries();
             return ResponseEntity.ok(countries);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(500).build();
         }
     }
 }
