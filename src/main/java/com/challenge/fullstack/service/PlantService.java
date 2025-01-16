@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import java.util.stream.Collectors;
-
 @Service
 public class PlantService {
 
@@ -42,34 +41,34 @@ public class PlantService {
     }
 
     public PlantModel createPlant(String nombre, String countryName) {
+        // Buscar el país en la base de datos
         Country country = countryRepository.findByName(countryName)
                 .orElseThrow(() -> new RuntimeException("País no encontrado: " + countryName));
 
+        // Crear una nueva planta
         PlantModel plant = new PlantModel();
         plant.setNombre(nombre);
         plant.setCountry(country);
-        plant.setCantidadLecturas((int) (Math.random() * 100));
-        plant.setAlertasMedias((int) (Math.random() * 50));
-        plant.setAlertasRojas((int) (Math.random() * 20));
+        plant.setCantidadLecturas((int) (Math.random() * 100)); // Simulación de lecturas
+        plant.setAlertasMedias((int) (Math.random() * 50)); // Simulación de alertas medias
+        plant.setAlertasRojas((int) (Math.random() * 20)); // Simulación de alertas rojas
 
         return iPlantRepository.save(plant);
     }
 
-        public int getReadingsOkCount() {
-            return iPlantRepository.countByReadingsOk(); // Este método debe estar definido en el repositorio
-        }
-
-        public int getMediumAlertsCount() {
-            return iPlantRepository.countByMediumAlerts(); // Este método debe estar definido en el repositorio
-        }
-
-        public int getRedAlertsCount() {
-            return iPlantRepository.countByRedAlerts(); // Este método debe estar definido en el repositorio
-        }
-
-        public int getDisabledSensorsCount() {
-            return iPlantRepository.countByDisabledSensors(); // Este método debe estar definido en el repositorio
-        }
+    public int getReadingsOkCount() {
+        return iPlantRepository.countByReadingsOk();
     }
 
+    public int getMediumAlertsCount() {
+        return iPlantRepository.countByMediumAlerts();
+    }
 
+    public int getRedAlertsCount() {
+        return iPlantRepository.countByRedAlerts();
+    }
+
+    public int getDisabledSensorsCount() {
+        return iPlantRepository.countByDisabledSensors();
+    }
+}
