@@ -19,24 +19,20 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class CountryService {
 
     private final CountryRepository countryRepository;
     private final RestTemplate restTemplate;
-    private final Gson gson;
+    private static final String REST_COUNTRIES_API_URL = "https://restcountries.com/v3.1/all";
+    private static final int BATCH_SIZE = 10; // Tamaño del lote de procesamiento
 
-    @Value("${external.api.url:https://restcountries.com/v3.1/all}")
-    private String REST_COUNTRIES_API_URL;
-
-    public CountryService(CountryRepository countryRepository, RestTemplate restTemplate, Gson gson) {
+    public CountryService(CountryRepository countryRepository, RestTemplate restTemplate) {
         this.countryRepository = countryRepository;
         this.restTemplate = restTemplate;
-        this.gson = gson;
     }
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void initializeCountries() {
         if (countryRepository.count() > 0) {
             System.out.println("Los países ya están en la base de datos.");
@@ -44,39 +40,37 @@ public class CountryService {
         }
 
         System.out.println("Iniciando la carga de países desde la API externa...");
+
         try {
-            // Consumir la API externa
+            // Obtener todos los datos desde la API externa
             String response = restTemplate.getForObject(REST_COUNTRIES_API_URL, String.class);
 
-            if (response == null || response.isEmpty()) {
-                throw new RuntimeException("La respuesta de la API es vacía o nula");
-            }
-
-            // Parsear JSON con Gson
+            // Parsear la respuesta JSON a una lista de objetos DTO
+            Gson gson = new Gson();
             Type listType = new TypeToken<List<MinimalCountryDto>>() {}.getType();
             List<MinimalCountryDto> countryDtos = gson.fromJson(response, listType);
 
-            if (countryDtos == null || countryDtos.isEmpty()) {
-                throw new RuntimeException("No se pudieron parsear los datos de la API");
-            }
+            // Procesar en lotes
+            for (int i = 0; i < countryDtos.size(); i += BATCH_SIZE) {
+                List<MinimalCountryDto> batch = countryDtos.subList(
+                        i,
+                        Math.min(i + BATCH_SIZE, countryDtos.size())
+                );
 
-            // Filtrar y mapear datos relevantes
-            List<Country> countries = countryDtos.stream()
-                    .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
-                    .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
-                    .collect(Collectors.toList());
+                // Filtrar y mapear los datos del lote
+                List<Country> countries = batch.stream()
+                        .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
+                        .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
+                        .collect(Collectors.toList());
 
-            if (countries.isEmpty()) {
-                System.out.println("No se encontraron países válidos en la respuesta.");
-            } else {
+                // Guardar el lote en la base de datos
                 countryRepository.saveAll(countries);
-                System.out.println("Países almacenados correctamente: " + countries.size());
+                System.out.println("Lote de países almacenado: " + (i / BATCH_SIZE + 1));
             }
-        } catch (JsonSyntaxException e) {
-            System.err.println("Error al parsear JSON: " + e.getMessage());
-            e.printStackTrace();
+
+            System.out.println("Todos los países fueron almacenados correctamente.");
         } catch (Exception e) {
-            System.err.println("Error general: " + e.getMessage());
+            System.err.println("Error al consumir la API externa: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -88,11 +82,5 @@ public class CountryService {
                         new CountryDto.Flags(country.getFlagUrl())
                 ))
                 .toList();
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void onApplicationReady() {
-        System.out.println("Aplicación lista. Iniciando carga de países...");
-        initializeCountries();
     }
 }
