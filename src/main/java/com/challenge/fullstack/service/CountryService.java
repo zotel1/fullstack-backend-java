@@ -19,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Service
 public class CountryService {
 
@@ -40,37 +39,33 @@ public class CountryService {
         }
 
         System.out.println("Iniciando la carga de países desde la API externa...");
-        try {
-            ResponseEntity<String> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, String.class);
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            try {
+                ResponseEntity<String> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, String.class);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
+                if (!response.getStatusCode().is2xxSuccessful()) {
+                    throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
+                }
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                RestCountryDto[] countryDtos = objectMapper.readValue(response.getBody(), RestCountryDto[].class);
+
+                List<Country> countries = Arrays.stream(countryDtos)
+                        .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
+                        .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
+                        .collect(Collectors.toList());
+
+                countryRepository.saveAll(countries);
+                System.out.println("Países almacenados correctamente.");
+                return; // Salir del bucle si la solicitud fue exitosa
+            } catch (Exception e) {
+                System.err.println("Intento " + attempt + " fallido: " + e.getMessage());
+                if (attempt == 3) {
+                    System.err.println("Error al consumir la API externa después de 3 intentos");
+                    e.printStackTrace();
+                }
             }
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            RestCountryDto[] countryDtos = objectMapper.readValue(response.getBody(), RestCountryDto[].class);
-
-            List<Country> countries = Arrays.stream(countryDtos)
-                    .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
-                    .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
-                    .collect(Collectors.toList());
-
-            countryRepository.saveAll(countries);
-            System.out.println("Países almacenados correctamente.");
-        } catch (Exception e) {
-            System.err.println("Error al consumir la API externa: " + e.getMessage());
-            e.printStackTrace();
         }
-    }
-
-    // Método para obtener todos los países desde la base de datos
-    public List<CountryDto> getAllCountries() {
-        return countryRepository.findAll().stream()
-                .map(country -> new CountryDto(
-                        new CountryDto.Name(country.getName()),
-                        new CountryDto.Flags(country.getFlagUrl())
-                ))
-                .collect(Collectors.toList());
     }
 }

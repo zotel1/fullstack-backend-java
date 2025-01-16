@@ -16,27 +16,23 @@ public class AppConfig {
 
     @Bean
     public RestTemplate restTemplate() {
-        // Configuración del pool de conexiones
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(100); // Máximo de conexiones totales
-        connectionManager.setDefaultMaxPerRoute(50); // Máximo de conexiones por ruta
+        connectionManager.setMaxTotal(100);
+        connectionManager.setDefaultMaxPerRoute(50);
 
-        // Configuración de tiempos de espera
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(30)) // Tiempo para establecer conexión
-                .setResponseTimeout(Timeout.ofSeconds(120)) // Tiempo de espera para respuesta
-                .setConnectionRequestTimeout(Timeout.ofSeconds(30)) // Tiempo para obtener conexión del pool
+                .setConnectTimeout(Timeout.ofMinutes(1)) // Incrementar tiempo de conexión
+                .setResponseTimeout(Timeout.ofMinutes(2)) // Incrementar tiempo de respuesta
+                .setConnectionRequestTimeout(Timeout.ofMinutes(1)) // Incrementar tiempo para obtener conexión
                 .build();
 
-        // Configuración del cliente HTTP
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(requestConfig)
-                .evictExpiredConnections() // Eliminar conexiones caducadas
-                .evictIdleConnections(TimeValue.ofSeconds(60)) // Eliminar conexiones inactivas después de 60 segundos
+                .evictExpiredConnections()
+                .evictIdleConnections(TimeValue.ofMinutes(1))
                 .build();
 
-        // Crear RestTemplate con HttpClient
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         return new RestTemplate(requestFactory);
     }
