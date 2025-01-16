@@ -7,11 +7,14 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.util.TimeValue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import org.apache.hc.core5.util.Timeout;
+import java.util.concurrent.TimeUnit;
+
 @Configuration
 public class AppConfig {
 
@@ -19,39 +22,47 @@ public class AppConfig {
     public RestTemplate restTemplate() {
         // Configuración del pool de conexiones
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(50); // Máximo de conexiones totales
-        connectionManager.setDefaultMaxPerRoute(20); // Máximo de conexiones por ruta
+        connectionManager.setMaxTotal(100); // Máximo de conexiones totales
+        connectionManager.setDefaultMaxPerRoute(50); // Máximo de conexiones por ruta
 
-        // Configuración del cliente HTTP con tiempos de espera
+        // Configuración de tiempos de espera
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(15)) // Tiempo de conexión: 15 segundos
-                .setResponseTimeout(Timeout.ofSeconds(60)) // Tiempo de espera de socket: 60 segundos
-                .setConnectionRequestTimeout(Timeout.ofSeconds(15)) // Tiempo de espera de solicitud: 15 segundos
+                .setConnectTimeout(30000) // Tiempo de conexión: 30 segundos
+                .setResponseTimeout(60000) // Tiempo de espera de respuesta: 60 segundos
+                .setConnectionRequestTimeout(30000) // Tiempo para solicitar una conexión: 30 segundos
                 .build();
 
+        // Configuración del cliente HTTP
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setDefaultRequestConfig(requestConfig)
                 .evictExpiredConnections() // Eliminar conexiones caducadas
-                .evictIdleConnections(TimeValue.ofSeconds(30)) // Eliminar conexiones inactivas tras 30 segundos
+                .evictIdleConnections(TimeValue.ofSeconds(60)) // Eliminar conexiones inactivas después de 60 segundos
                 .build();
 
+        // Crear fábrica de solicitudes HTTP
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 
+        // Crear RestTemplate con la fábrica de solicitudes
         RestTemplate restTemplate = new RestTemplate(requestFactory);
 
-        // Lógica de reintento
-        restTemplate.getInterceptors().add((request, body, execution) -> {
-            for (int i = 0; i < 3; i++) {
+        // Añadir interceptor para lógica de reintento
+        restTemplate.getInterceptors().add(retryInterceptor());
+
+        return restTemplate;
+    }
+
+    // Interceptor para lógica de reintento
+    private ClientHttpRequestInterceptor retryInterceptor() {
+        return (request, body, execution) -> {
+            for (int i = 0; i < 3; i++) { // Intentar 3 veces
                 try {
                     return execution.execute(request, body);
                 } catch (IOException ex) {
-                    if (i == 2) throw ex; // Lanza la excepción si falla tras 3 intentos
+                    if (i == 2) throw ex; // Si falla después de 3 intentos, lanzar excepción
                 }
             }
             return null;
-        });
-
-        return restTemplate;
+        };
     }
 }
