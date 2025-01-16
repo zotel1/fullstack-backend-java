@@ -1,8 +1,5 @@
 package com.challenge.fullstack.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class MinimalCountryDto {
     private Name name;
     private Flags flags;
@@ -23,7 +20,6 @@ public class MinimalCountryDto {
         this.flags = flags;
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Name {
         private String common;
 
@@ -36,7 +32,6 @@ public class MinimalCountryDto {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Flags {
         private String png;
 

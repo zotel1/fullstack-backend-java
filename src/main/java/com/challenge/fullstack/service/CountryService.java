@@ -1,32 +1,24 @@
 package com.challenge.fullstack.service;
 
+
 import com.challenge.fullstack.dto.CountryDto;
 import com.challenge.fullstack.dto.MinimalCountryDto;
 import com.challenge.fullstack.dto.PlantDto;
 import com.challenge.fullstack.dto.RestCountryDto;
 import com.challenge.fullstack.model.Country;
-import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
-import com.challenge.fullstack.repository.IPlantRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 
 @Service
 public class CountryService {
@@ -34,6 +26,7 @@ public class CountryService {
     private final CountryRepository countryRepository;
     private final RestTemplate restTemplate;
     private static final String REST_COUNTRIES_API_URL = "https://restcountries.com/v3.1/all";
+    private final Gson gson = new Gson();
 
     public CountryService(CountryRepository countryRepository, RestTemplate restTemplate) {
         this.countryRepository = countryRepository;
@@ -49,25 +42,20 @@ public class CountryService {
 
         System.out.println("Iniciando la carga de países desde la API externa...");
         try {
-            // Consumo de la API con un DTO reducido
-            ResponseEntity<List<MinimalCountryDto>> response = restTemplate.exchange(
-                    REST_COUNTRIES_API_URL,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<>() {}
-            );
+            // Consumir la API externa
+            String response = restTemplate.getForObject(REST_COUNTRIES_API_URL, String.class);
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
-            }
+            // Parsear JSON con Gson
+            Type listType = new TypeToken<List<MinimalCountryDto>>() {}.getType();
+            List<MinimalCountryDto> countryDtos = gson.fromJson(response, listType);
 
-            // Procesar solo los datos necesarios
-            List<Country> countries = response.getBody().stream()
+            // Filtrar y mapear datos relevantes
+            List<Country> countries = countryDtos.stream()
                     .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
                     .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
-                    .toList();
+                    .collect(Collectors.toList());
 
-            // Guardar los países en la base de datos
+            // Guardar en la base de datos
             countryRepository.saveAll(countries);
             System.out.println("Países almacenados correctamente.");
         } catch (Exception e) {
