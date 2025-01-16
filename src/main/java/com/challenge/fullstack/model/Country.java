@@ -17,11 +17,10 @@ public class Country {
     @Column(name = "flag_url")
     private String flagUrl;
 
-    public Country(){
-
+    public Country() {
     }
 
-    public Country(Long id, String name, String flagUrl){
+    public Country(Long id, String name, String flagUrl) {
         this.id = id;
         this.name = name;
         this.flagUrl = flagUrl;

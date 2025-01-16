@@ -2,17 +2,17 @@ package com.challenge.fullstack.dto;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryDto {
 
     private Name name;
     private Flags flags;
 
-    // Constructor vacío
     public CountryDto() {
     }
 
-    // Constructor completo
     public CountryDto(Name name, Flags flags) {
         this.name = name;
         this.flags = flags;
@@ -39,17 +39,14 @@ public class CountryDto {
         private String common;
         private String official;
 
-        // Constructor vacío
         public Name() {
         }
 
-        // Constructor para ambos campos
         public Name(String common, String official) {
             this.common = common;
             this.official = official;
         }
 
-        // Constructor para un solo campo (common)
         public Name(String common) {
             this.common = common;
         }
@@ -76,17 +73,14 @@ public class CountryDto {
         private String png;
         private String svg;
 
-        // Constructor vacío
         public Flags() {
         }
 
-        // Constructor completo
         public Flags(String png, String svg) {
             this.png = png;
             this.svg = svg;
         }
 
-        // Constructor para un solo campo (png)
         public Flags(String png) {
             this.png = png;
         }
