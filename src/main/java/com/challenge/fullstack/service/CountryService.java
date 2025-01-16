@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Service
 public class CountryService {
 
@@ -61,5 +62,15 @@ public class CountryService {
             System.err.println("Error al consumir la API externa: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    // Método para obtener todos los países desde la base de datos
+    public List<CountryDto> getAllCountries() {
+        return countryRepository.findAll().stream()
+                .map(country -> new CountryDto(
+                        new CountryDto.Name(country.getName()),
+                        new CountryDto.Flags(country.getFlagUrl())
+                ))
+                .collect(Collectors.toList());
     }
 }
