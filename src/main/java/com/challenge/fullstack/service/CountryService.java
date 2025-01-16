@@ -8,6 +8,7 @@ import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
 import com.challenge.fullstack.repository.IPlantRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 public class CountryService {
 
     private final CountryRepository countryRepository;
     private final RestTemplate restTemplate;
-
-    // URL de la API externa
     private static final String REST_COUNTRIES_API_URL = "https://restcountries.com/v3.1/all";
 
     public CountryService(CountryRepository countryRepository, RestTemplate restTemplate) {
@@ -34,10 +32,6 @@ public class CountryService {
         this.restTemplate = restTemplate;
     }
 
-    /**
-     * Inicializa los países en la base de datos desde la API externa.
-     * Se ejecuta automáticamente cuando se levanta el contexto de la aplicación.
-     */
     @PostConstruct
     public void initializeCountries() {
         if (countryRepository.count() > 0) {
@@ -47,23 +41,20 @@ public class CountryService {
 
         System.out.println("Iniciando la carga de países desde la API externa...");
         try {
-            // Realiza la solicitud a la API externa
             ResponseEntity<String> response = restTemplate.getForEntity(REST_COUNTRIES_API_URL, String.class);
 
-            // Registra la respuesta JSON
-            System.out.println("Respuesta de la API de países:");
-            System.out.println(response.getBody());
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                throw new RuntimeException("Respuesta no exitosa: " + response.getStatusCode());
+            }
 
-            // Deserializa la respuesta manualmente
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             RestCountryDto[] countryDtos = objectMapper.readValue(response.getBody(), RestCountryDto[].class);
 
-            // Guarda los países
             List<Country> countries = Arrays.stream(countryDtos)
                     .filter(dto -> dto.getName() != null && dto.getName().getCommon() != null && dto.getFlags() != null)
                     .map(dto -> new Country(null, dto.getName().getCommon(), dto.getFlags().getPng()))
                     .collect(Collectors.toList());
-
 
             countryRepository.saveAll(countries);
             System.out.println("Países almacenados correctamente.");
@@ -73,11 +64,6 @@ public class CountryService {
         }
     }
 
-
-    /**
-     * Obtiene la lista de todos los países desde la base de datos.
-     * @return Lista de países en formato DTO.
-     */
     public List<CountryDto> getAllCountries() {
         return countryRepository.findAll().stream()
                 .filter(country -> country.getName() != null && country.getFlagUrl() != null)
@@ -87,5 +73,4 @@ public class CountryService {
                 ))
                 .collect(Collectors.toList());
     }
-
 }
