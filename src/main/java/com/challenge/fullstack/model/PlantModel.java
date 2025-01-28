@@ -2,6 +2,8 @@ package com.challenge.fullstack.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 
 @Entity
 @Table(name = "plants")
@@ -27,11 +29,19 @@ public class PlantModel {
     // Agregar atributo "disabled" si es necesario
     private boolean disabled;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private UserModel createdBy;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
     public PlantModel(){
 
     }
 
-    public PlantModel(Long id, String nombre, Country country, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled){
+    public PlantModel(Long id, String nombre, Country country, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled, UserModel createdBy, Date createdAt){
         this.id = id;
         this.nombre = nombre;
         this.country = country;
@@ -40,6 +50,8 @@ public class PlantModel {
         this.alertasRojas = alertasRojas;
         this.readingsOk = readingsOk;
         this.disabled = disabled;
+        this.createdBy = createdBy;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -110,5 +122,19 @@ public class PlantModel {
         this.disabled = disabled;
     }
 
+    public UserModel getCreatedBy() {
+        return createdBy;
+    }
 
+    public void setCreatedBy(UserModel createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 }
