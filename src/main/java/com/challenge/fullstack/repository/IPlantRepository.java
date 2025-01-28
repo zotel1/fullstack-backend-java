@@ -3,7 +3,10 @@ package com.challenge.fullstack.repository;
 import com.challenge.fullstack.model.PlantModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
@@ -23,4 +26,11 @@ public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
     // Esta consulta debe coincidir con el atributo en PlantModel. Si disabled no existe, elimínala o corrige.
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = true")
     int countByDisabledSensors();
+
+    // Añadimos los metodos para filtrar las plantas por el usuario creador
+    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.id = :userId")
+    List<PlantModel> findByCreatedBy(@Param("userId") Long userId);
+
+    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.id = :userId OR :isAdmin = true")
+    List<PlantModel> findByForUserOrAdmin(@Param("userId") Long userId, @Param("isAdmin") boolean isAdmin);
 }
