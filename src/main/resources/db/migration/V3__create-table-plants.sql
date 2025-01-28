@@ -7,5 +7,8 @@ create table plants (
     alertas_rojas int not null,
     readings_ok boolean default false,
     disabled boolean default false,
-    constraint fk_plants_country_id foreign key (country_id) references country (id)
+    created_by bigint not null,
+    created_at timestamp default current_timestamp,
+    constraint fk_plants_country_id foreign key (country_id) references country (id),
+    constraint fk_plants_created_by foreign key (created_by) references users(user_id)
 );
