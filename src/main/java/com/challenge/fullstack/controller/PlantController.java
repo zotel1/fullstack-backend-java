@@ -5,6 +5,7 @@ import com.challenge.fullstack.model.Country;
 import com.challenge.fullstack.model.PlantModel;
 import com.challenge.fullstack.repository.CountryRepository;
 import com.challenge.fullstack.repository.IPlantRepository;
+import com.challenge.fullstack.service.JwtTokenService;
 import com.challenge.fullstack.service.PlantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,21 +28,25 @@ import java.util.Map;
 public class PlantController {
 
     private final PlantService plantService;
+    private final JwtTokenService jwtTokenService;
 
-    public PlantController(PlantService plantService) {
+    public PlantController(PlantService plantService, JwtTokenService jwtTokenService) {
         this.plantService = plantService;
+        this.jwtTokenService = jwtTokenService;
     }
 
     @GetMapping("/list")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<PlantDto>> getAllPlants() {
-        return ResponseEntity.ok(plantService.findAll());
+    public ResponseEntity<List<PlantDto>> getUserPlants(@RequestHeader("Authorization") String token) {
+        String username = jwtTokenService.extractUsername(token.substring(7));
+        return ResponseEntity.ok(plantService.findAll(username));
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<?> createPlant(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<?> createPlant(@RequestBody Map<String, Object> payload, @RequestHeader("Authorization") String token) {
         try {
+            String username = jwtTokenService.extractUsername(token.substring(7));
             String nombre = (String) payload.get("nombre");
             String countryName = (String) payload.get("countryName");
 
@@ -49,9 +54,10 @@ public class PlantController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faltan campos obligatorios.");
             }
 
-            PlantModel plant = plantService.createPlant(nombre, countryName);
+            PlantModel plant = plantService.createPlant(nombre, countryName, username);
             return ResponseEntity.status(HttpStatus.CREATED).body(plant);
-
+        }catch (RuntimeException e) {
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al crear la planta: " + e.getMessage());
         }
