@@ -35,11 +35,9 @@ public class PlantModel {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private Date createdAt = new Date();
 
-    public PlantModel(){
-
-    }
+    public PlantModel(){}
 
     public PlantModel(Long id, String nombre, Country country, Integer cantidadLecturas, Integer alertasMedias, Integer alertasRojas, boolean readingsOk, boolean disabled, UserModel createdBy, Date createdAt){
         this.id = id;

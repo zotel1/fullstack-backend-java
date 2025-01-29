@@ -28,9 +28,9 @@ public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
     int countByDisabledSensors();
 
     // Añadimos los metodos para filtrar las plantas por el usuario creador
-    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.id = :userId")
+    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId")
     List<PlantModel> findByCreatedBy(@Param("userId") Long userId);
-
-    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.id = :userId OR :isAdmin = true")
-    List<PlantModel> findByForUserOrAdmin(@Param("userId") Long userId, @Param("isAdmin") boolean isAdmin);
+// Permitimos a los administradores ver todas las plantas
+    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId OR :isAdmin = true")
+    List<PlantModel> findPlantsForUser(@Param("userId") Long userId, @Param("isAdmin") boolean isAdmin);
 }
