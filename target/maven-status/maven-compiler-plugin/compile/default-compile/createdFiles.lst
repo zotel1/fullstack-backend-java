@@ -13,6 +13,7 @@ com/challenge/fullstack/repository/IPlantRepository.class
 com/challenge/fullstack/config/SecurityConfig.class
 com/challenge/fullstack/dto/RestCountryDto.class
 com/challenge/fullstack/dto/PlantDto.class
+com/challenge/fullstack/config/JpaConfig.class
 com/challenge/fullstack/controller/CountryController.class
 com/challenge/fullstack/service/UserDetailsServiceImpl.class
 com/challenge/fullstack/FullstackTechForbApplication.class
@@ -34,6 +35,5 @@ com/challenge/fullstack/service/CountryApiService.class
 com/challenge/fullstack/dto/AuthRequestDto.class
 com/challenge/fullstack/service/CountryService$1.class
 com/challenge/fullstack/dto/CountryDto.class
-com/challenge/fullstack/config/MysqlUrlProcessor.class
 com/challenge/fullstack/config/JacksonConfig.class
 com/challenge/fullstack/service/CountryService.class

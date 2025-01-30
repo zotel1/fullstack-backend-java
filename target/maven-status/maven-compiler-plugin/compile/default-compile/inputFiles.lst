@@ -1,6 +1,6 @@
 /home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/FullstackTechForbApplication.java
 /home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/config/JacksonConfig.java
-/home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/config/MysqlUrlProcessor.java
+/home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/config/JpaConfig.java
 /home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/config/SecurityConfig.java
 /home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/config/rest/AppConfig.java
 /home/cris/Documentos/presentacion/fullstack-backend-java/src/main/java/com/challenge/fullstack/controller/AuthController.java
