@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
 
-    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.readingsOk = TRUE")
+    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.readingsOk = true")
     int countByReadingsOk();
 
 
@@ -24,13 +24,13 @@ public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
     int countByRedAlerts();
 
     // Esta consulta debe coincidir con el atributo en PlantModel. Si disabled no existe, elimínala o corrige.
-    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = TRUE")
+    @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = true")
     int countByDisabledSensors();
 
     // Añadimos los metodos para filtrar las plantas por el usuario creador
     @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId")
     List<PlantModel> findByCreatedBy(@Param("userId") Long userId);
 // Permitimos a los administradores ver todas las plantas
-    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId OR :isAdmin = TRUE")
+    @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId OR :isAdmin = true")
     List<PlantModel> findPlantsForUser(@Param("userId") Long userId, @Param("isAdmin") boolean isAdmin);
 }

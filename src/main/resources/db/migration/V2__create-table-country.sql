@@ -1,5 +1,5 @@
 create table country (
-    id serial primary key,
-    name varchar(100) not null unique,
+    id bigint not null auto_increment primary key,
+    name varchar(100) not null,
     flag_url varchar(255)
 );
