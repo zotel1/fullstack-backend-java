@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +41,17 @@ public class PlantController {
     public ResponseEntity<List<PlantDto>> getUserPlants(@RequestHeader("Authorization") String token) {
         String username = jwtTokenService.extractUsername(token.substring(7));
         return ResponseEntity.ok(plantService.findAll(username));
+    }
+
+    @GetMapping("/list-paginated")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Page<PlantDto>> getPaginatedPlants(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int size,
+            @RequestHeader("Authorization") String token) {
+        String username = jwtTokenService.extractUsername(token.substring(7));
+        Page<PlantDto> plants = plantService.findAllPaginated(username, page, size);
+        return ResponseEntity.ok(plants);
     }
 
     @PostMapping("/create")
