@@ -10,6 +10,9 @@ import com.challenge.fullstack.repository.IPlantRepository;
 import com.challenge.fullstack.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -75,6 +78,28 @@ public class PlantService {
         plant.setCreatedAt(new Date());
 
         return iPlantRepository.save(plant);
+    }
+
+    public Page<PlantDto> findAllPaginated(String username, int page, int size) {
+        UserModel user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        boolean isAdmin = "ADMIN".equals(user.getRole());
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<PlantModel> plantPage = iPlantRepository.findPlantsForUserPaginated(user.getUser_id(), isAdmin, pageRequest);
+
+        return plantPage.map(plant -> new PlantDto(
+                plant.getId(),
+                plant.getNombre(),
+                plant.getCountry().getName(),
+                plant.getCountry().getFlagUrl(),
+                plant.getCantidadLecturas(),
+                plant.getAlertasMedias(),
+                plant.getAlertasRojas()
+        ));
     }
 
     public int getReadingsOkCount() {
