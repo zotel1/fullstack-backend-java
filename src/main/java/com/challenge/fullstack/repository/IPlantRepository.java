@@ -14,20 +14,20 @@ import java.util.List;
 public interface IPlantRepository extends JpaRepository<PlantModel, Long> {
 
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.readingsOk = true")
-    int countByReadingsOk();
+    int countByCantidadLecturas();
 
 
     // Consulta corregida para alertasMedias (alertasMedias es el nombre en PlantModel)
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.alertasMedias > 0")
-    int countByMediumAlerts();
+    int countByAlertasMedias();
 
     // Consulta corregida para alertasRojas (alertasRojas es el nombre en PlantModel)
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.alertasRojas > 0")
-    int countByRedAlerts();
+    int countByAlertasRojas();
 
     // Esta consulta debe coincidir con el atributo en PlantModel. Si disabled no existe, elimínala o corrige.
     @Query("SELECT COUNT(p) FROM PlantModel p WHERE p.disabled = true")
-    int countByDisabledSensors();
+    int countBySensoresInactivos();
 
     // Añadimos los metodos para filtrar las plantas por el usuario creador
     @Query("SELECT p FROM PlantModel p WHERE p.createdBy.user_id = :userId")

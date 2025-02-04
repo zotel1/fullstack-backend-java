@@ -24,10 +24,10 @@ public class SummaryController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getSummary() {
         Map<String, Object> summary = new HashMap<>();
-        summary.put("readingsOk", plantService.getReadingsOkCount());
-        summary.put("mediumAlerts", plantService.getMediumAlertsCount());
-        summary.put("redAlerts", plantService.getRedAlertsCount());
-        summary.put("disabledSensors", plantService.getDisabledSensorsCount());
+        summary.put("cantidadLecturas", plantService.getCantidadLecturasCount());
+        summary.put("alertasMedias", plantService.getAlertasMediasCount());
+        summary.put("alertasRojas", plantService.getAlertasRojasCount());
+        summary.put("sensoresInactivos", plantService.getSensoresInactivosCount());
 
         return ResponseEntity.ok(summary);
     }

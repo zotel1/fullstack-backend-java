@@ -102,19 +102,19 @@ public class PlantService {
         ));
     }
 
-    public int getReadingsOkCount() {
-        return iPlantRepository.countByReadingsOk();
+    public int getCantidadLecturasCount() {
+        return iPlantRepository.countByCantidadLecturas();
     }
 
-    public int getMediumAlertsCount() {
-        return iPlantRepository.countByMediumAlerts();
+    public int getAlertasMediasCount() {
+        return iPlantRepository.countByAlertasMedias();
     }
 
-    public int getRedAlertsCount() {
-        return iPlantRepository.countByRedAlerts();
+    public int getAlertasRojasCount() {
+        return iPlantRepository.countByAlertasRojas();
     }
 
-    public int getDisabledSensorsCount() {
-        return iPlantRepository.countByDisabledSensors();
+    public int getSensoresInactivosCount() {
+        return iPlantRepository.countBySensoresInactivos();
     }
 }
